@@ -22,9 +22,18 @@
 
 #include "ogs-core.h"
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+#endif
+
 #include "model/nf_profile.h"
 #include "model/nf_group_cond.h"
 #include "model/smf_info.h"
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #ifdef __cplusplus
 extern "C" {
