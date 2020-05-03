@@ -15,27 +15,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-open5gs_sysconfdir = join_paths(sysconfdir, 'open5gs')
-meson.add_install_script(python3_exe, '-c',
-        mkdir_p.format(open5gs_sysconfdir))
+libnrf_sources = files('''
+    context.c
+    init.c
+'''.split())
 
-open5gs_conf = '''
-    mme.yaml
-    hss.yaml
-    sgw.yaml
-    pgw.yaml
-    pcrf.yaml
+libnrf = static_library('nrf',
+    sources : libnrf_sources,
+    link_with : libipfw,
+    dependencies : [
+        libapp_dep, libsbi_dep
+    ],
+    install : false)
 
-    nrf.yaml
-    smf.yaml
-    upf.yaml
-'''.split()
+libnrf_dep = declare_dependency(
+    link_with : libnrf,
+    dependencies : [
+        libapp_dep, libsbi_dep
+    ])
 
-foreach file : open5gs_conf
-    gen = configure_file(
-            input : file + '.in',
-            output : file,
-            configuration : conf_data)
-    meson.add_install_script(python3_exe, '-c',
-            install_conf.format(gen, open5gs_sysconfdir))
-endforeach
+nrf_sources = files('''
+    app.c
+    ../main.c
+'''.split())
+
+executable('open5gs-nrfd',
+    sources : nrf_sources,
+    c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/nrf.yaml"'.format(open5gs_sysconfdir),
+    include_directories : srcinc,
+    dependencies : libnrf_dep,
+    install_rpath : libdir,
+    install : true)

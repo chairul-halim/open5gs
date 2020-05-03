@@ -17,57 +17,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OGS_APP_H
-#define OGS_APP_H
+#ifndef NRF_CONTEXT_H
+#define NRF_CONTEXT_H
 
-#include "ogs-core.h"
-
-#define OGS_APP_INSIDE
-
-extern int __ogs_app_domain;
-
-#include "app/ogs-yaml.h"
-#include "app/ogs-config.h"
-#include "app/ogs-init.h"
-
-#undef OGS_APP_INSIDE
-
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __ogs_app_domain
+#include "ogs-app.h"
+#if 0
+#include "ogs-sbi.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int app_initialize(const char *const argv[]);
-void app_terminate(void);
+extern int __nrf_log_domain;
 
-int mme_initialize(void);
-void mme_terminate(void);
+#undef OGS_LOG_DOMAIN
+#define OGS_LOG_DOMAIN __nrf_log_domain
 
-int hss_initialize(void);
-void hss_terminate(void);
+typedef struct nrf_context_s {
+    uint32_t        gtpu_port;      /* Default: NRF GTP-U local port */
+} nrf_context_t;
 
-int sgw_initialize(void);
-void sgw_terminate(void);
+void nrf_context_init(void);
+void nrf_context_final(void);
+nrf_context_t *nrf_self(void);
 
-int pgw_initialize(void);
-void pgw_terminate(void);
-
-int pcrf_initialize(void);
-void pcrf_terminate(void);
-
-int nrf_initialize(void);
-void nrf_terminate(void);
-
-int smf_initialize(void);
-void smf_terminate(void);
-
-int upf_initialize(void);
-void upf_terminate(void);
+int nrf_context_parse_config(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OGS_APP_H */
+#endif /* NRF_CONTEXT_H */
