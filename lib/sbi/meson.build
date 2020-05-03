@@ -112,8 +112,8 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
 endif
 
 libmicrohttpd_dep = dependency('libmicrohttpd')
-libulfius_dep = cc.find_library('ulfius', required : true)
 libcurl_dep = dependency('libcurl')
+libulfius_dep = cc.find_library('ulfius', required : true)
 
 libsbi = library('ogssbi',
     sources : libsbi_sources,
