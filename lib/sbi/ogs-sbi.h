@@ -35,6 +35,8 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include "ulfius.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
