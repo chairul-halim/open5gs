@@ -121,7 +121,7 @@ libsbi = library('ogssbi',
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
     dependencies : [
-        libcore_dep, libmicrohttpd_dep, libulfius_dep, libcurl_dep
+        libcore_dep, libmicrohttpd_dep, libcurl_dep, libulfius_dep
     ],
     install : true)
 
@@ -129,5 +129,5 @@ libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
     dependencies : [
-        libcore_dep, libmicrohttpd_dep, libulfius_dep, libcurl_dep
+        libcore_dep, libmicrohttpd_dep, libcurl_dep, libulfius_dep
     ])
