@@ -26,12 +26,15 @@
 #if 0
 static ogs_thread_t *thread;
 static void nrf_main(void *data);
-
-static int initialized = 0;
 #endif
+static int initialized = 0;
 
 int nrf_initialize()
 {
+    int rv;
+
+    rv = ogs_sbi_init(8080);
+    if (rv != OGS_OK) return OGS_ERROR;
 #if 0
     int rv;
 
@@ -57,18 +60,19 @@ int nrf_initialize()
 
     thread = ogs_thread_create(nrf_main, NULL);
     if (!thread) return OGS_ERROR;
+#endif
 
     initialized = 1;
 
-#endif
     return OGS_OK;
 }
 
 void nrf_terminate(void)
 {
-#if 0
     if (!initialized) return;
 
+    ogs_sbi_final();
+#if 0
     nrf_event_term();
 
     ogs_thread_destroy(thread);

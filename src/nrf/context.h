@@ -21,9 +21,7 @@
 #define NRF_CONTEXT_H
 
 #include "ogs-app.h"
-#if 0
 #include "ogs-sbi.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

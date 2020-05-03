@@ -35,8 +35,6 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include "ulfius.h"
-
 #define OGS_SBI_INSIDE
 
 #include "sbi/base.h"

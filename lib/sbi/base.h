@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-int ogs_sbi_init(void);
+int ogs_sbi_init(uint16_t port);
 void ogs_sbi_final(void);
 
 #ifdef __cplusplus

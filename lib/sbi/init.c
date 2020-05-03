@@ -19,13 +19,47 @@
 
 #include "ogs-sbi.h"
 
+#include "ulfius.h"
+
 int __ogs_sbi_domain;
 
-int ogs_sbi_init(void)
+static struct _u_instance instance;
+
+int callback_hello_world(const struct _u_request * request,
+        struct _u_response * response, void * user_data)
 {
-    return 0;
+    ulfius_set_string_body_response(response, 200, "Hello World!");
+    return U_CALLBACK_CONTINUE;
+}
+
+int ogs_sbi_init(uint16_t port)
+{
+    int rv;
+
+    rv = ulfius_init_instance(&instance, port, NULL, NULL);
+    if (rv != OGS_OK) {
+        ogs_error("ulfius_init_instance(%d) failed", port);
+        return OGS_ERROR;
+    }
+
+    ulfius_add_endpoint_by_val(&instance,
+            "GET", "/helloworld", NULL, 0, &callback_hello_world, NULL);
+
+    rv = ulfius_start_framework(&instance);
+    if (rv != OGS_OK) {
+        ogs_error("ulfius_start_framework(%d) failed", port);
+        return OGS_ERROR;
+    }
+
+    return OGS_OK;
 }
 
 void ogs_sbi_final(void)
 {
+    int rv;
+    rv = ulfius_stop_framework(&instance);
+    if (rv != OGS_OK)
+        ogs_error("ulfius_stop_framework failed");
+
+    ulfius_clean_instance(&instance);
 }
