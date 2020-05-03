@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 libsbi_sources = files('''
+    path.c
+    init.c
+
     src/list.c
     src/apiKey.c
     external/cJSON.c

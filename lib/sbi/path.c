@@ -17,43 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OGS_SBI_H
-#define OGS_SBI_H
+#include "ogs-sbi.h"
 
-#include "ogs-core.h"
+ogs_sock_t *ogs_sbi_server(ogs_socknode_t *node)
+{
+    char buf[OGS_ADDRSTRLEN];
+    ogs_sock_t *sbi;
+    ogs_assert(node);
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-prototypes"
-#endif
+    sbi = ogs_udp_server(node);
+    ogs_assert(sbi);
 
-#include "model/nf_profile.h"
-#include "model/nf_group_cond.h"
-#include "model/smf_info.h"
+    ogs_info("sbi_server() [%s]:%d",
+            OGS_ADDR(node->addr, buf), OGS_PORT(node->addr));
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
-#include "ulfius.h"
-
-#define OGS_SBI_INSIDE
-
-#include "sbi/base.h"
-
-#undef OGS_SBI_INSIDE
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern int __ogs_sbi_domain;
-
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __ogs_sbi_domain
-
-#ifdef __cplusplus
+    return sbi;
 }
-#endif
-
-#endif /* OGS_SBI_H */

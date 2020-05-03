@@ -17,43 +17,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OGS_SBI_H
-#define OGS_SBI_H
+#include "ogs-sbi.h"
 
-#include "ogs-core.h"
+int __ogs_sbi_domain;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-prototypes"
-#endif
-
-#include "model/nf_profile.h"
-#include "model/nf_group_cond.h"
-#include "model/smf_info.h"
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
-#include "ulfius.h"
-
-#define OGS_SBI_INSIDE
-
-#include "sbi/base.h"
-
-#undef OGS_SBI_INSIDE
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern int __ogs_sbi_domain;
-
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __ogs_sbi_domain
-
-#ifdef __cplusplus
+int ogs_sbi_init(void)
+{
+    return 0;
 }
-#endif
 
-#endif /* OGS_SBI_H */
+void ogs_sbi_final(void)
+{
+}

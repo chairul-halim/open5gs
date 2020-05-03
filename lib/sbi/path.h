@@ -17,43 +17,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OGS_SBI_H
-#define OGS_SBI_H
-
-#include "ogs-core.h"
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+#if !defined(OGS_SBI_INSIDE) && !defined(OGS_SBI_COMPILATION)
+#error "This header cannot be included directly."
 #endif
 
-#include "model/nf_profile.h"
-#include "model/nf_group_cond.h"
-#include "model/smf_info.h"
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
-#include "ulfius.h"
-
-#define OGS_SBI_INSIDE
-
-#include "sbi/base.h"
-
-#undef OGS_SBI_INSIDE
+#ifndef OGS_SBI_PATH_H
+#define OGS_SBI_PATH_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int __ogs_sbi_domain;
-
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __ogs_sbi_domain
+ogs_sock_t *ogs_sbi_server(ogs_socknode_t *node);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OGS_SBI_H */
+#endif /* OGS_SBI_PATH_H */
