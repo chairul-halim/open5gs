@@ -33,21 +33,9 @@ int nrf_initialize()
 {
     int rv;
 
-    rv = ogs_sbi_init(8080);
-    if (rv != OGS_OK) return OGS_ERROR;
-#if 0
-    int rv;
-
-    ogs_pfcp_context_init(OGS_MAX_NUM_OF_GTPU_RESOURCE);
     nrf_context_init();
-    nrf_event_init();
 
-    rv = ogs_pfcp_xact_init(nrf_self()->timer_mgr, 512);
-    if (rv != OGS_OK) return rv;
-
-    rv = ogs_pfcp_context_parse_config("nrf", "smf");
-    if (rv != OGS_OK) return rv;
-
+#if 0
     rv = nrf_context_parse_config();
     if (rv != OGS_OK) return rv;
 
@@ -55,12 +43,12 @@ int nrf_initialize()
             ogs_config()->logger.domain, ogs_config()->logger.level);
     if (rv != OGS_OK) return rv;
 
-    rv = ogs_pfcp_ue_pool_generate();
+    rv = nrf_db_init();
     if (rv != OGS_OK) return rv;
-
-    thread = ogs_thread_create(nrf_main, NULL);
-    if (!thread) return OGS_ERROR;
 #endif
+
+    rv = ogs_sbi_init(8080);
+    if (rv != OGS_OK) return OGS_ERROR;
 
     initialized = 1;
 
@@ -72,18 +60,11 @@ void nrf_terminate(void)
     if (!initialized) return;
 
     ogs_sbi_final();
+
 #if 0
-    nrf_event_term();
-
-    ogs_thread_destroy(thread);
-
-    nrf_context_final();
-    ogs_pfcp_context_final();
-
-    ogs_pfcp_xact_final();
-
-    nrf_event_final();
+    nrf_db_final();
 #endif
+    nrf_context_final();
 }
 
 #if 0

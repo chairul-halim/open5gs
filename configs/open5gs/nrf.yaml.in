@@ -23,6 +23,31 @@ db_uri: mongodb://localhost/open5gs
 logger:
     file: @localstatedir@/log/open5gs/nrf.log
 
+#
+# sbi:
+#
+#  o SBI Server(all address avaiable)
+#
+#  o SBI Server(0.0.0.0:80)
+#    addr: 0.0.0.0
+#
+#  o SBI Server(127.0.0.1:80, [::1]:80)
+#    - addr: 127.0.0.1
+#    - addr: ::1
+#
+#  o SBI Server(different port)
+#    - addr: 127.0.0.1
+#      port: 8080
+#
+#  o SBI Server(address avaiable in `eth0` interface)
+#    dev: eth0
+#
+sbi:
+    addr: 127.0.0.1
+
+#
+# nrf:
+#
 nrf:
 
 #

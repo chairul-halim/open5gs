@@ -32,6 +32,7 @@ void nrf_context_init(void)
     /* Initialize NRF context */
     memset(&self, 0, sizeof(nrf_context_t));
 
+    ogs_log_install_domain(&__ogs_sbi_domain, "sbi", ogs_core()->log.level);
     ogs_log_install_domain(&__nrf_log_domain, "nrf", ogs_core()->log.level);
 
     context_initiaized = 1;
