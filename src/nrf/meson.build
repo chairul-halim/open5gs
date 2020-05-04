@@ -17,22 +17,25 @@
 
 libnrf_sources = files('''
     context.c
+    event.c
+    nrf-sm.c
+
     init.c
 '''.split())
 
 libnrf = static_library('nrf',
     sources : libnrf_sources,
     link_with : libipfw,
-    dependencies : [
-        libapp_dep, libsbi_dep
-    ],
+    dependencies : [libapp_dep,
+                    libdbi_dep,
+                    libsbi_dep],
     install : false)
 
 libnrf_dep = declare_dependency(
     link_with : libnrf,
-    dependencies : [
-        libapp_dep, libsbi_dep
-    ])
+    dependencies : [libapp_dep,
+                    libdbi_dep,
+                    libsbi_dep])
 
 nrf_sources = files('''
     app.c

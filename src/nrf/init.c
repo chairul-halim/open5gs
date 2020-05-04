@@ -18,15 +18,11 @@
  */
 
 #include "context.h"
-#if 0
 #include "event.h"
 #include "nrf-sm.h"
-#endif
 
-#if 0
 static ogs_thread_t *thread;
 static void nrf_main(void *data);
-#endif
 static int initialized = 0;
 
 int nrf_initialize()
@@ -34,8 +30,8 @@ int nrf_initialize()
     int rv;
 
     nrf_context_init();
+    nrf_event_init();
 
-#if 0
     rv = nrf_context_parse_config();
     if (rv != OGS_OK) return rv;
 
@@ -45,10 +41,12 @@ int nrf_initialize()
 
     rv = nrf_db_init();
     if (rv != OGS_OK) return rv;
-#endif
 
     rv = ogs_sbi_init(8080);
     if (rv != OGS_OK) return OGS_ERROR;
+
+    thread = ogs_thread_create(nrf_main, NULL);
+    if (!thread) return OGS_ERROR;
 
     initialized = 1;
 
@@ -59,15 +57,17 @@ void nrf_terminate(void)
 {
     if (!initialized) return;
 
-    ogs_sbi_final();
+    nrf_event_term();
 
-#if 0
+    ogs_thread_destroy(thread);
+
+    ogs_sbi_final();
     nrf_db_final();
-#endif
+
     nrf_context_final();
+    nrf_event_final();
 }
 
-#if 0
 static void nrf_main(void *data)
 {
     ogs_fsm_t nrf_sm;
@@ -126,4 +126,3 @@ done:
     ogs_fsm_fini(&nrf_sm, 0);
     ogs_fsm_delete(&nrf_sm);
 }
-#endif

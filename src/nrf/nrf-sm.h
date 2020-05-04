@@ -17,41 +17,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NRF_CONTEXT_H
-#define NRF_CONTEXT_H
+#ifndef NRF_SM_H
+#define NRF_SM_H
 
-#include "ogs-app.h"
-#include "ogs-sbi.h"
+#include "event.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int __nrf_log_domain;
+void nrf_state_initial(ogs_fsm_t *s, nrf_event_t *e);
+void nrf_state_final(ogs_fsm_t *s, nrf_event_t *e);
+void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e);
 
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __nrf_log_domain
-
-typedef struct nrf_context_s {
-    ogs_queue_t     *queue;         /* Queue for processing UPF control */
-    ogs_timer_mgr_t *timer_mgr;     /* Timer Manager */
-    ogs_pollset_t   *pollset;       /* Poll Set for I/O Multiplexing */
-
-    void                *NFProfileCollection;
-    ogs_thread_mutex_t  db_lock;
-} nrf_context_t;
-
-void nrf_context_init(void);
-void nrf_context_final(void);
-nrf_context_t *nrf_self(void);
-
-int nrf_context_parse_config(void);
-
-int nrf_db_init(void);
-int nrf_db_final(void);
+#define nrf_sm_debug(__pe) \
+    ogs_debug("%s(): %s", __func__, nrf_event_get_name(__pe))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NRF_CONTEXT_H */
+#endif /* NRF_SM_H */
