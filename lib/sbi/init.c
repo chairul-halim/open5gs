@@ -19,7 +19,7 @@
 
 #include "ogs-sbi.h"
 
-#include "ulfius.h"
+#include "mhd/ulfius.h"
 
 #define PREFIX "/test"
 #define PREFIXJSON "/testjson"
@@ -31,7 +31,7 @@ int __ogs_sbi_domain;
 
 static struct _u_instance instance;
 
-#if 0
+#if 1
 char * print_map(const struct _u_map * map)
 {
   char * line, * to_return = NULL;
@@ -140,8 +140,10 @@ int ogs_sbi_init(uint16_t port)
         return OGS_ERROR;
     }
 
+#if 1
 #if 0
     ulfius_add_endpoint_by_val(&instance, "GET", NULL, "*", 0, &callback_get, NULL);
+#endif
 
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, NULL, 0, &callback_get_test, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/empty", 0, &callback_get_empty_response, NULL);

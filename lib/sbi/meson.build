@@ -19,6 +19,15 @@ libsbi_sources = files('''
     path.c
     init.c
 
+    mhd/u_map.c
+    mhd/u_response.c
+    mhd/ulfius-cfg.h
+    mhd/yuarel.c
+    mhd/u_send_request.c
+    mhd/ulfius.c
+    mhd/u_request.c
+    mhd/u_websocket.c
+
     src/list.c
     src/apiKey.c
     external/cJSON.c
@@ -111,12 +120,19 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
                     '-Wno-unused-label',
                     '-Wno-float-equal',
                     '-Wno-discarded-qualifiers',
+                    '-Wno-implicit-function-declaration', # FIXME
+                    '-Wno-nested-externs', # FIXME
+                    '-Wno-int-conversion', # FIXME
+                    '-Wno-suggest-attribute=noreturn', # FIXME
     ])
 endif
 
-libmicrohttpd_dep = dependency('libmicrohttpd')
-libulfius_dep = cc.find_library('ulfius', required : true)
 liborcania_dep = cc.find_library('orcania', required : true)
+libyder_dep = cc.find_library('yder', required : true)
+libgnutls_dep = cc.find_library('gnutls', required : true)
+libjansson_dep = dependency('jansson')
+libmicrohttpd_dep = dependency('libmicrohttpd')
+libcurl_dep = dependency('libcurl')
 
 libsbi = library('ogssbi',
     sources : libsbi_sources,
@@ -124,15 +140,21 @@ libsbi = library('ogssbi',
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
-                    libmicrohttpd_dep,
                     liborcania_dep,
-                    libulfius_dep],
+                    libyder_dep,
+                    libjansson_dep,
+                    libgnutls_dep,
+                    libmicrohttpd_dep,
+                    libcurl_dep],
     install : true)
 
 libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
-                    libmicrohttpd_dep,
                     liborcania_dep,
-                    libulfius_dep])
+                    libyder_dep,
+                    libjansson_dep,
+                    libgnutls_dep,
+                    libmicrohttpd_dep,
+                    libcurl_dep])
