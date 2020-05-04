@@ -32,8 +32,6 @@ extern "C"
 {
 #endif
 
-#include "ulfius-cfg.h"
-
 /** External dependencies **/
 
 #ifndef U_DISABLE_GNUTLS
