@@ -21,7 +21,6 @@ libsbi_sources = files('''
 
     mhd/u_map.c
     mhd/u_response.c
-    mhd/u_send_request.c
     mhd/ulfius.c
     mhd/u_request.c
 

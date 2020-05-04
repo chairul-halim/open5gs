@@ -109,25 +109,6 @@ int callback_all_test_foo (const struct _u_request * request, struct _u_response
   return U_CALLBACK_CONTINUE;
 }
 
-int callback_get (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  struct _u_request * req = ulfius_duplicate_request(request);
-  struct _u_response * res = o_malloc(sizeof(struct _u_response));
-  ulfius_init_response(res);
-  int len;
-
-  o_free(req->http_url);
-  u_map_remove_from_key(req->map_header, "Host");
-  len = snprintf(NULL, 0, "%s%s", PROXY_DEST, request->http_url);
-  req->http_url = o_malloc((len+1)*sizeof(char));
-  snprintf(req->http_url, (len+1), "%s%s", PROXY_DEST, request->http_url);
-  printf("Accessing %s as proxy\n", req->http_url);
-  req->timeout = 30;
-  ulfius_send_http_request(req, res);
-  ulfius_copy_response(response, res);
-  ulfius_clean_response_full(res);
-  ulfius_clean_request_full(req);
-  return U_CALLBACK_CONTINUE;
-}
 #endif
 
 int ogs_sbi_init(uint16_t port)
@@ -141,10 +122,6 @@ int ogs_sbi_init(uint16_t port)
     }
 
 #if 1
-#if 0
-    ulfius_add_endpoint_by_val(&instance, "GET", NULL, "*", 0, &callback_get, NULL);
-#endif
-
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, NULL, 0, &callback_get_test, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/empty", 0, &callback_get_empty_response, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/multiple/:multiple/:multiple/:not_multiple", 0, &callback_all_test_foo, NULL);
