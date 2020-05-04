@@ -24,9 +24,6 @@
  * 
  */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "u_private.h"
 #include "ulfius.h"
 

@@ -23,10 +23,6 @@
  * 
  */
 
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <pthread.h>
 #include "u_private.h"
 #include "ulfius.h"
 

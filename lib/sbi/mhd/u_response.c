@@ -22,7 +22,6 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-#include <string.h>
 
 #include "u_private.h"
 #include "ulfius.h"
