@@ -383,14 +383,6 @@ int ulfius_clean_response(struct _u_response * response) {
     response->auth_realm = NULL;
     response->map_cookie = NULL;
     response->binary_body = NULL;
-#ifndef U_DISABLE_WEBSOCKET
-    /* ulfius_clean_response might be called without websocket_handle being initialized */
-    if ((struct _websocket_handle *)response->websocket_handle) {
-      o_free(((struct _websocket_handle *)response->websocket_handle)->websocket_protocol);
-      o_free(((struct _websocket_handle *)response->websocket_handle)->websocket_extensions);
-      o_free(response->websocket_handle);
-    }
-#endif
     return U_OK;
   } else {
     return U_ERROR_PARAMS;
@@ -440,21 +432,6 @@ int ulfius_init_response(struct _u_response * response) {
     response->stream_user_data = NULL;
     response->timeout = 0;
     response->shared_data = NULL;
-#ifndef U_DISABLE_WEBSOCKET
-    response->websocket_handle = o_malloc(sizeof(struct _websocket_handle));
-    if (response->websocket_handle == NULL) {
-      y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for response->websocket_handle");
-      return U_ERROR_MEMORY;
-    }
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_protocol = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_extensions = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_manager_callback = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_manager_user_data = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_incoming_message_callback = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_incoming_user_data = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_onclose_callback = NULL;
-    ((struct _websocket_handle *)response->websocket_handle)->websocket_onclose_user_data = NULL;
-#endif
     return U_OK;
   } else {
     return U_ERROR_PARAMS;
@@ -515,18 +492,6 @@ int ulfius_copy_response(struct _u_response * dest, const struct _u_response * s
     
     dest->shared_data = source->shared_data;
     dest->timeout = source->timeout;
-#ifndef U_DISABLE_WEBSOCKET
-    if (source->websocket_handle != NULL) {
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_protocol = o_strdup(((struct _websocket_handle *)source->websocket_handle)->websocket_protocol);
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_extensions = o_strdup(((struct _websocket_handle *)source->websocket_handle)->websocket_extensions);
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_manager_callback = ((struct _websocket_handle *)source->websocket_handle)->websocket_manager_callback;
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_manager_user_data = ((struct _websocket_handle *)source->websocket_handle)->websocket_manager_user_data;
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_incoming_message_callback = ((struct _websocket_handle *)source->websocket_handle)->websocket_incoming_message_callback;
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_incoming_user_data = ((struct _websocket_handle *)source->websocket_handle)->websocket_incoming_user_data;
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_onclose_callback = ((struct _websocket_handle *)source->websocket_handle)->websocket_onclose_callback;
-      ((struct _websocket_handle *)dest->websocket_handle)->websocket_onclose_user_data = ((struct _websocket_handle *)source->websocket_handle)->websocket_onclose_user_data;
-    }
-#endif
     return U_OK;
   } else {
     return U_ERROR_PARAMS;

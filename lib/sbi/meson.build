@@ -21,12 +21,9 @@ libsbi_sources = files('''
 
     mhd/u_map.c
     mhd/u_response.c
-    mhd/ulfius-cfg.h
-    mhd/yuarel.c
     mhd/u_send_request.c
     mhd/ulfius.c
     mhd/u_request.c
-    mhd/u_websocket.c
 
     src/list.c
     src/apiKey.c

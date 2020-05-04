@@ -37,7 +37,6 @@
 /* #undef U_DISABLE_JANSSON */
 /* #undef U_DISABLE_CURL */
 /* #undef U_DISABLE_GNUTLS */
-/* #undef U_DISABLE_WEBSOCKET */
 /* #undef U_DISABLE_YDER */
 /* #undef U_WITH_FREERTOS */
 /* #undef U_WITH_LWIP */
