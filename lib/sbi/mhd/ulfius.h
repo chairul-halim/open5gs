@@ -36,13 +36,8 @@ extern "C"
 
 /** External dependencies **/
 
-#ifndef U_DISABLE_GNUTLS
-  #ifndef _GNU_SOURCE
-    #define _GNU_SOURCE
-  #endif
-  #include <gnutls/gnutls.h>
-  #include <gnutls/x509.h>
-#endif
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
 #include <pthread.h>
 #include <microhttpd.h>
@@ -237,12 +232,25 @@ struct _u_request {
   void *               binary_body; /* !< raw body */
   size_t               binary_body_length; /* !< length of raw body */
   unsigned int         callback_position; /* !< position of the current callback function in the callback list, starts at 0 */
-#ifndef U_DISABLE_GNUTLS
-  gnutls_x509_crt_t    client_cert; /* !< x509 certificate of the client if the instance uses client certificate authentication and the client is authenticated, available only if websocket support is enabled */
-  char *               client_cert_file; /* !< path to client certificate file for sending http requests with certificate authentication, available only if websocket support is enabled */
-  char *               client_key_file; /* !< path to client key file for sending http requests with certificate authentication, available only if websocket support is enabled */
-  char *               client_key_password; /* !< password to unlock client key file, available only if websocket support is enabled */
-#endif
+  gnutls_x509_crt_t    client_cert; /* !< x509 certificate of the client
+                                       if the instance uses client certificate
+                                       authentication and the client is
+                                       authenticated, available only
+                                       if websocket support is enabled */
+  char *               client_cert_file; /* !< path to client certificate file
+                                            for sending http requests with
+                                            certificate authentication,
+                                            available only if websocket
+                                            support is enabled */
+  char *               client_key_file; /* !< path to client key file
+                                           for sending http requests
+                                           with certificate authentication,
+                                           available only if websocket support
+                                           is enabled */
+  char *               client_key_password; /* !< password to unlock client
+                                               key file, available only
+                                               if websocket support is
+                                               enabled */
 };
 
 /**
@@ -345,12 +353,10 @@ struct _u_instance {
                      are valid utf8 strings, if a parameter value
                      has non utf8 character, the value, will be ignored,
                      default 1 */
-#ifndef U_DISABLE_GNUTLS
   int use_client_cert_auth; /* !< Internal variable use to indicate
                                if the instance uses client certificate
                                authentication, Do not change this value,
                                available only if websocket support is enabled */
-#endif
 };
 
 /**
@@ -451,7 +457,6 @@ int ulfius_start_framework(struct _u_instance * u_instance);
  */
 int ulfius_start_secure_framework(struct _u_instance * u_instance, const char * key_pem, const char * cert_pem);
 
-#ifndef U_DISABLE_GNUTLS
 /**
  * ulfius_start_secure_ca_trust_framework
  * Initializes the framework and run the webservice based on the parameters given using an HTTPS connection
@@ -464,7 +469,6 @@ int ulfius_start_secure_framework(struct _u_instance * u_instance, const char * 
  * @return U_OK on success
  */
 int ulfius_start_secure_ca_trust_framework(struct _u_instance * u_instance, const char * key_pem, const char * cert_pem, const char * root_ca_pem);
-#endif
 
 /**
  * ulfius_stop_framework
@@ -1267,7 +1271,6 @@ int u_map_empty(struct _u_map * u_map);
  * @{
  */
 
-#ifndef U_DISABLE_GNUTLS
 /*
  * ulfius_export_client_certificate_pem
  * Exports the client certificate using PEM format
@@ -1275,7 +1278,7 @@ int u_map_empty(struct _u_map * u_map);
  * @return the certificate in PEM format
  * returned value must be u_free'd after use
  */
-char * ulfius_export_client_certificate_pem(const struct _u_request * request);
+char *ulfius_export_client_certificate_pem(const struct _u_request *request);
 
 /*
  * ulfius_import_client_certificate_pem
@@ -1284,9 +1287,9 @@ char * ulfius_export_client_certificate_pem(const struct _u_request * request);
  * @param str_cert client certificate in PEM format
  * @return U_OK on success
  */
-int ulfius_import_client_certificate_pem(struct _u_request * request, const char * str_cert);
+int ulfius_import_client_certificate_pem(
+        struct _u_request *request, const char *str_cert);
 
-#endif // U_DISABLE_GNUTLS
 
 /**
  * @}

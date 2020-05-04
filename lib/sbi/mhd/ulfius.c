@@ -398,14 +398,12 @@ static int ulfius_webservice_dispatcher(void *cls,
     int mhd_ret = MHD_NO, callback_ret = U_OK, i, close_loop = 0,
         inner_error = U_OK, mhd_response_flag;
 
-#ifndef U_DISABLE_GNUTLS
     // Client certificate authentication variables
     const union MHD_ConnectionInfo *ci;
     unsigned int listsize;
     const gnutls_datum_t *pcert;
     gnutls_certificate_status_t client_cert_status = 0;
     int ret_cert;
-#endif
     char *content_type, *auth_realm = NULL;
     struct _u_response *response = NULL;
     struct sockaddr *so_client;
@@ -430,8 +428,6 @@ static int ulfius_webservice_dispatcher(void *cls,
     }
 
     if (con_info->callback_first_iteration) {
-
-#ifndef U_DISABLE_GNUTLS
         ci = MHD_get_connection_info(
                 connection, MHD_CONNECTION_INFO_GNUTLS_SESSION);
         if (((struct _u_instance *)cls)->use_client_cert_auth &&
@@ -462,7 +458,6 @@ static int ulfius_webservice_dispatcher(void *cls,
                 }
             }
         }
-#endif
         con_info->callback_first_iteration = 0;
         so_client = MHD_get_connection_info(
                 connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS)->client_addr;
@@ -1002,11 +997,7 @@ static struct MHD_Daemon *ulfius_run_mhd_daemon(struct _u_instance *u_instance,
  */
 int ulfius_start_framework(struct _u_instance * u_instance)
 {
-#ifndef U_DISABLE_GNUTLS
   return ulfius_start_secure_ca_trust_framework(u_instance, NULL, NULL, NULL);
-#else
-  return ulfius_start_secure_framework(u_instance, NULL, NULL);
-#endif
 }
 
 /**
@@ -1023,47 +1014,10 @@ int ulfius_start_framework(struct _u_instance * u_instance)
 int ulfius_start_secure_framework(struct _u_instance *u_instance,
         const char * key_pem, const char * cert_pem)
 {
-#ifndef U_DISABLE_GNUTLS
     return ulfius_start_secure_ca_trust_framework(u_instance,
             key_pem, cert_pem, NULL);
-#else
-    // Check parameters and validate u_instance and endpoint_list
-    // that there is no mistake
-    if (u_instance == NULL) {
-        y_log_message(Y_LOG_LEVEL_ERROR,
-                "Ulfius - ulfius_start_secure_framework - "
-                "Error, u_instance is NULL");
-        return U_ERROR_PARAMS;
-    } else if ((key_pem == NULL && cert_pem != NULL) ||
-            (key_pem != NULL && cert_pem == NULL)) {
-        y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - "
-                "ulfius_start_secure_framework - "
-                "Error, you must specify key_pem and cert_pem");
-        return U_ERROR_PARAMS;
-    }
-    if (ulfius_validate_instance(u_instance) == U_OK) {
-        u_instance->mhd_daemon =
-            ulfius_run_mhd_daemon(u_instance, key_pem, cert_pem, NULL);
-
-        if (u_instance->mhd_daemon == NULL) {
-            y_log_message(Y_LOG_LEVEL_ERROR,
-                    "Ulfius - Error MHD_start_daemon, aborting");
-            u_instance->status = U_STATUS_ERROR;
-            return U_ERROR_LIBMHD;
-        } else {
-            u_instance->status = U_STATUS_RUNNING;
-            return U_OK;
-        }
-    } else {
-        y_log_message(Y_LOG_LEVEL_ERROR,
-                "Ulfius - ulfius_start_secure_framework - "
-                "error input parameters");
-        return U_ERROR_PARAMS;
-    }
-#endif
 }
 
-#ifndef U_DISABLE_GNUTLS
 /**
  * ulfius_start_secure_ca_trust_framework
  * Initializes the framework and run the webservice based
@@ -1125,7 +1079,6 @@ int ulfius_start_secure_ca_trust_framework(struct _u_instance *u_instance,
         return U_ERROR_PARAMS;
     }
 }
-#endif
 
 /**
  * ulfius_stop_framework
@@ -1610,9 +1563,7 @@ static int internal_ulfius_init_instance(struct _u_instance * u_instance,
         u_instance->max_post_body_size = 0;
         u_instance->file_upload_callback = NULL;
         u_instance->file_upload_cls = NULL;
-#ifndef U_DISABLE_GNUTLS
         u_instance->use_client_cert_auth = 0;
-#endif
         u_instance->websocket_handler = NULL;
         return U_OK;
     } else {

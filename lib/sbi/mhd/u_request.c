@@ -332,12 +332,10 @@ int ulfius_init_request(struct _u_request * request) {
     request->binary_body = NULL;
     request->binary_body_length = 0;
     request->callback_position = 0;
-#ifndef U_DISABLE_GNUTLS
     request->client_cert = NULL;
     request->client_cert_file = NULL;
     request->client_key_file = NULL;
     request->client_key_password = NULL;
-#endif
     return U_OK;
   } else {
     return U_ERROR_PARAMS;
@@ -377,12 +375,10 @@ int ulfius_clean_request(struct _u_request * request) {
     request->map_cookie = NULL;
     request->map_post_body = NULL;
     request->binary_body = NULL;
-#ifndef U_DISABLE_GNUTLS
     gnutls_x509_crt_deinit(request->client_cert);
     o_free(request->client_cert_file);
     o_free(request->client_key_file);
     o_free(request->client_key_password);
-#endif
     return U_OK;
   } else {
     return U_ERROR_PARAMS;
@@ -494,7 +490,6 @@ int ulfius_copy_request(struct _u_request * dest, const struct _u_request * sour
       }
     }
 
-#ifndef U_DISABLE_GNUTLS
     dest->client_cert_file = o_strdup(source->client_cert_file);
     dest->client_key_file = o_strdup(source->client_key_file);
     dest->client_key_password = o_strdup(source->client_key_password);
@@ -511,7 +506,6 @@ int ulfius_copy_request(struct _u_request * dest, const struct _u_request * sour
         ret = U_ERROR;
       }
     }
-#endif
     return ret;
   } else {
     return U_ERROR_PARAMS;
@@ -612,7 +606,6 @@ struct _u_request * ulfius_duplicate_request(const struct _u_request * request) 
   return new_request;
 }
 
-#ifndef U_DISABLE_GNUTLS
 /*
  * ulfius_export_client_certificate_pem
  * Exports the client certificate using PEM format
@@ -665,4 +658,3 @@ int ulfius_import_client_certificate_pem(struct _u_request * request, const char
 
   return ret;
 }
-#endif
