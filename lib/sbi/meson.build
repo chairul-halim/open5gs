@@ -19,7 +19,6 @@ libsbi_sources = files('''
     path.c
     init.c
 
-    mhd/memory.c
     mhd/orcania.c
     mhd/u_map.c
     mhd/u_response.c
