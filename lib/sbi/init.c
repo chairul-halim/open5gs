@@ -31,29 +31,6 @@ int __ogs_sbi_domain;
 
 static struct _u_instance instance;
 
-#if 0
-char * msprintf(const char * message, ...) {
-  va_list argp, argp_cpy;
-  size_t out_len = 0;
-  char * out = NULL;
-  if (message != NULL) {
-    va_start(argp, message);
-    va_copy(argp_cpy, argp); // We make a copy because in some architectures, vsnprintf can modify argp
-    out_len = vsnprintf(NULL, 0, message, argp);
-    out = ogs_malloc(out_len+sizeof(char));
-    if (out == NULL) {
-      va_end(argp);
-      va_end(argp_cpy);
-      return NULL;
-    }
-    vsnprintf(out, (out_len+sizeof(char)), message, argp_cpy);
-    va_end(argp);
-    va_end(argp_cpy);
-  }
-  return out;
-}
-#endif
-
 char * print_map(const struct _u_map * map)
 {
   char * line, * to_return = NULL;
@@ -64,20 +41,20 @@ char * print_map(const struct _u_map * map)
     for (i=0; keys[i] != NULL; i++) {
       value = u_map_get(map, keys[i]);
       len = snprintf(NULL, 0, "key is %s, value is %s", keys[i], value);
-      line = ogs_malloc((len+1)*sizeof(char));
+      line = o_malloc((len+1)*sizeof(char));
       snprintf(line, (len+1), "key is %s, value is %s", keys[i], value);
       if (to_return != NULL) {
         len = o_strlen(to_return) + o_strlen(line) + 1;
-        to_return = ogs_realloc(to_return, (len+1)*sizeof(char));
+        to_return = o_realloc(to_return, (len+1)*sizeof(char));
         if (o_strlen(to_return) > 0) {
           strcat(to_return, "\n");
         }
       } else {
-        to_return = ogs_malloc((o_strlen(line) + 1)*sizeof(char));
+        to_return = o_malloc((o_strlen(line) + 1)*sizeof(char));
         to_return[0] = 0;
       }
       strcat(to_return, line);
-      ogs_free(line);
+      o_free(line);
     }
     return to_return;
   } else {
@@ -107,7 +84,7 @@ int callback_post_test (const struct _u_request * request,
     char *response_body = msprintf("Hello World!\n%s", post_params);
     ulfius_set_string_body_response(response, 200, response_body);
     o_free(response_body);
-    ogs_free(post_params);
+    o_free(post_params);
 
     return U_CALLBACK_CONTINUE;
 }
@@ -123,10 +100,10 @@ int callback_all_test_foo (const struct _u_request * request, struct _u_response
                                   request->http_verb, request->http_url, url_params, cookies, headers, post_params, (char *)user_data);
 #endif
   ulfius_set_string_body_response(response, 200, response_body);
-  ogs_free(url_params);
-  ogs_free(headers);
-  ogs_free(cookies);
-  ogs_free(post_params);
+  o_free(url_params);
+  o_free(headers);
+  o_free(cookies);
+  o_free(post_params);
   o_free(response_body);
   return U_CALLBACK_CONTINUE;
 }
