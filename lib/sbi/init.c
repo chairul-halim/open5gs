@@ -108,7 +108,6 @@ int callback_all_test_foo (const struct _u_request * request, struct _u_response
   o_free(response_body);
   return U_CALLBACK_CONTINUE;
 }
-#endif
 
 int callback_get (const struct _u_request * request, struct _u_response * response, void * user_data) {
   struct _u_request * req = ulfius_duplicate_request(request);
@@ -129,6 +128,7 @@ int callback_get (const struct _u_request * request, struct _u_response * respon
   ulfius_clean_request_full(req);
   return U_CALLBACK_CONTINUE;
 }
+#endif
 
 int ogs_sbi_init(uint16_t port)
 {
@@ -140,9 +140,9 @@ int ogs_sbi_init(uint16_t port)
         return OGS_ERROR;
     }
 
+#if 0
     ulfius_add_endpoint_by_val(&instance, "GET", NULL, "*", 0, &callback_get, NULL);
 
-#if 0
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, NULL, 0, &callback_get_test, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/empty", 0, &callback_get_empty_response, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/multiple/:multiple/:multiple/:not_multiple", 0, &callback_all_test_foo, NULL);

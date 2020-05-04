@@ -17,6 +17,8 @@
 
 libnrf_sources = files('''
     context.c
+    event.c
+    nrf-sm.c
 
     init.c
 '''.split())

@@ -17,41 +17,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NRF_CONTEXT_H
-#define NRF_CONTEXT_H
+#ifndef NRF_EVENT_H
+#define NRF_EVENT_H
 
-#include "ogs-app.h"
-#include "ogs-sbi.h"
+#include "ogs-core.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int __nrf_log_domain;
+typedef enum {
+    NRF_EVT_BASE = OGS_FSM_USER_SIG,
 
-#undef OGS_LOG_DOMAIN
-#define OGS_LOG_DOMAIN __nrf_log_domain
+    NRF_EVT_SBI_MESSAGE,
 
-typedef struct nrf_context_s {
-    ogs_queue_t     *queue;         /* Queue for processing UPF control */
-    ogs_timer_mgr_t *timer_mgr;     /* Timer Manager */
-    ogs_pollset_t   *pollset;       /* Poll Set for I/O Multiplexing */
+    NRF_EVT_TOP,
 
-    void                *NFProfileCollection;
-    ogs_thread_mutex_t  db_lock;
-} nrf_context_t;
+} nrf_event_e;
 
-void nrf_context_init(void);
-void nrf_context_final(void);
-nrf_context_t *nrf_self(void);
+typedef struct nrf_event_s {
+    int id;
+} nrf_event_t;
 
-int nrf_context_parse_config(void);
+void nrf_event_init(void);
+void nrf_event_term(void);
+void nrf_event_final(void);
 
-int nrf_db_init(void);
-int nrf_db_final(void);
+nrf_event_t *nrf_event_new(nrf_event_e id);
+void nrf_event_free(nrf_event_t *e);
+
+const char *nrf_event_get_name(nrf_event_t *e);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NRF_CONTEXT_H */
+#endif /* NRF_EVENT_H */
