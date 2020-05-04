@@ -106,94 +106,6 @@ char * o_strndup(const char * source, size_t len) {
 }
 
 /**
- * o_strcmp
- * a modified strcmp function that don't crash when p1 is NULL or p2 us NULL
- */
-int o_strcmp(const char * p1, const char * p2) {
-  if (p1 == NULL && p2 == NULL) {
-    return 0;
-  } else if (p1 != NULL && p2 == NULL) {
-    return -1;
-  } else if (p1 == NULL) {
-    return 1;
-  } else {
-    return strcmp(p1, p2);
-  }
-}
-
-/**
- * o_strncmp
- * a modified strncmp function that don't crash when p1 is NULL or p2 us NULL
- */
-int o_strncmp(const char * p1, const char * p2, size_t n) {
-  if ((p1 == NULL && p2 == NULL) || n <= 0) {
-    return 0;
-  } else if (p1 != NULL && p2 == NULL) {
-    return -1;
-  } else if (p1 == NULL) {
-    return 1;
-  } else {
-    return strncmp(p1, p2, n);
-  }
-}
-
-/**
- * o_strcasecmp
- * a modified strcasecmp function that don't crash when p1 is NULL or p2 us NULL
- */
-int o_strcasecmp(const char * p1, const char * p2) {
-  if (p1 == NULL && p2 == NULL) {
-    return 0;
-  } else if (p1 != NULL && p2 == NULL) {
-    return -1;
-  } else if (p1 == NULL && p2 != NULL) {
-    return 1;
-  } else {
-    return strcasecmp(p1, p2);
-  }
-}
-
-/**
- * o_strncasecmp
- * a modified strncasecmp function that don't crash when p1 is NULL or p2 us NULL
- */
-int o_strncasecmp(const char * p1, const char * p2, size_t n) {
-  if ((p1 == NULL && p2 == NULL) || n <= 0) {
-    return 0;
-  } else if (p1 != NULL && p2 == NULL) {
-    return -1;
-  } else if (p1 == NULL && p2 != NULL) {
-    return 1;
-  } else {
-    return strncasecmp(p1, p2, n);
-  }
-}
-
-/**
- * o_strchr
- * a modified strchr function that don't crash when haystack is NULL
- */
-char * o_strchr(const char * haystack, int c) {
-  if (haystack == NULL) {
-    return NULL;
-  } else {
-    return strchr(haystack, c);
-  }
-}
-
-/**
- * o_strlen
- * a modified version of strlen that don't crash when s is NULL
- */
-size_t o_strlen(const char * s) {
-  if (s == NULL) {
-    return 0;
-  } else {
-    return strlen(s);
-  }
-}
-
-/**
  * Remove string of beginning and ending whitespaces
  */
 char * trimwhitespace(char * str) {
@@ -207,7 +119,7 @@ char * trimwhitespace(char * str) {
 
   while(isspace((unsigned char)*str)) str++;
 
-  end = str + o_strlen(str) - 1;
+  end = str + ogs_strlen(str) - 1;
   while(end > str && isspace((unsigned char)*end)) {
     end--;
   }
@@ -231,7 +143,7 @@ char * trimcharacter(char * str, char to_remove) {
 
   while(*str == to_remove) str++;
 
-  end = str + o_strlen(str) - 1;
+  end = str + ogs_strlen(str) - 1;
   while(end > str && (*end == to_remove)) {
     end--;
   }

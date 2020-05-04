@@ -236,7 +236,7 @@ int ulfius_add_same_site_cookie_to_response(struct _u_response * response, const
   if (response != NULL && key != NULL && (same_site == U_COOKIE_SAME_SITE_NONE || same_site == U_COOKIE_SAME_SITE_STRICT || same_site == U_COOKIE_SAME_SITE_LAX)) {
     // Look for cookies with the same key
     for (i=0; i<response->nb_cookies; i++) {
-      if (0 == o_strcmp(response->map_cookie[i].key, key)) {
+      if (0 == ogs_strcmp(response->map_cookie[i].key, key)) {
         // Key found, replace cookie
         o_free(response->map_cookie[i].value);
         o_free(response->map_cookie[i].expires);
@@ -541,7 +541,7 @@ int ulfius_set_string_body_response(struct _u_response * response, const unsigne
       return U_ERROR_MEMORY;
     } else {
       response->status = status;
-      response->binary_body_length = o_strlen(string_body);
+      response->binary_body_length = ogs_strlen(string_body);
       return U_OK;
     }
   } else {

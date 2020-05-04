@@ -55,6 +55,11 @@ void *ogs_memdup(const void *m, size_t n);
 
 char *ogs_cpystrn(char *dst, const char *src, size_t dst_size);
 
+int ogs_strcmp(const char *s1, const char *s2);
+int ogs_strncmp(const char *s1, const char *s2, size_t n);
+char * ogs_strchr(const char *s, int c);
+size_t ogs_strlen(const char *s);
+
 #ifdef __cplusplus
 }
 #endif

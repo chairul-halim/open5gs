@@ -44,13 +44,13 @@ char * print_map(const struct _u_map * map)
       line = o_malloc((len+1)*sizeof(char));
       snprintf(line, (len+1), "key is %s, value is %s", keys[i], value);
       if (to_return != NULL) {
-        len = o_strlen(to_return) + o_strlen(line) + 1;
+        len = ogs_strlen(to_return) + ogs_strlen(line) + 1;
         to_return = o_realloc(to_return, (len+1)*sizeof(char));
-        if (o_strlen(to_return) > 0) {
+        if (ogs_strlen(to_return) > 0) {
           strcat(to_return, "\n");
         }
       } else {
-        to_return = o_malloc((o_strlen(line) + 1)*sizeof(char));
+        to_return = o_malloc((ogs_strlen(line) + 1)*sizeof(char));
         to_return[0] = 0;
       }
       strcat(to_return, line);

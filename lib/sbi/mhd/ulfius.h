@@ -32,6 +32,8 @@ extern "C"
 {
 #endif
 
+#include "ogs-core.h"
+
 /** External dependencies **/
 
 #ifndef U_DISABLE_GNUTLS

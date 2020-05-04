@@ -67,7 +67,7 @@ static char ** ulfius_split_url(const char * prefix, const char * url) {
       url_cpy = url_cpy_addr = o_strdup(url);
       cur_word = strtok_r( url_cpy, ULFIUS_URL_SEPARATOR, &saveptr );
       while (cur_word != NULL) {
-        if (0 != o_strcmp("", cur_word) && cur_word[0] != '?') {
+        if (0 != ogs_strcmp("", cur_word) && cur_word[0] != '?') {
           to_return = o_realloc(to_return, (counter+1)*sizeof(char*));
           if (to_return == NULL) {
             y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for ulfius_split_url.to_return");
@@ -120,7 +120,7 @@ static int ulfius_url_format_match(const char ** splitted_url, const char ** spl
     if (splitted_url_format[i][0] == '*' && splitted_url_format[i+1] == NULL) {
       return 1;
     }
-    if (splitted_url[i] == NULL || (splitted_url_format[i][0] != '@' && splitted_url_format[i][0] != ':' && 0 != o_strcmp(splitted_url_format[i], splitted_url[i]))) {
+    if (splitted_url[i] == NULL || (splitted_url_format[i][0] != '@' && splitted_url_format[i][0] != ':' && 0 != ogs_strcmp(splitted_url_format[i], splitted_url[i]))) {
       return 0;
     }
   }
@@ -183,7 +183,7 @@ struct _u_endpoint ** ulfius_endpoint_match(const char * method, const char * ur
     if (method != NULL && url != NULL && endpoint_list != NULL) {
       splitted_url = ulfius_split_url(url, NULL);
       for (i=0; (splitted_url != NULL && !ulfius_equals_endpoints(&(endpoint_list[i]), ulfius_empty_endpoint())); i++) {
-        if (0 == o_strcasecmp(endpoint_list[i].http_method, method) || endpoint_list[i].http_method[0] == '*') {
+        if (0 == ogs_strcasecmp(endpoint_list[i].http_method, method) || endpoint_list[i].http_method[0] == '*') {
           splitted_url_format = ulfius_split_url(endpoint_list[i].url_prefix, endpoint_list[i].url_format);
           if (splitted_url_format != NULL && ulfius_url_format_match((const char **)splitted_url, (const char **)splitted_url_format)) {
             endpoint_returned = o_realloc(endpoint_returned, (count+2)*sizeof(struct _u_endpoint *));
@@ -535,7 +535,7 @@ int ulfius_set_string_body_request(struct _u_request * request, const char * str
       y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for request->binary_body");
       return U_ERROR_MEMORY;
     } else {
-      request->binary_body_length = o_strlen(string_body);
+      request->binary_body_length = ogs_strlen(string_body);
       return U_OK;
     }
   } else {
@@ -651,7 +651,7 @@ int ulfius_import_client_certificate_pem(struct _u_request * request, const char
 
   if (request != NULL && str_cert != NULL) {
     g_cert.data = (unsigned char *)str_cert;
-    g_cert.size = o_strlen(str_cert);
+    g_cert.size = ogs_strlen(str_cert);
     if ((res = gnutls_x509_crt_init(&request->client_cert))) {
       y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error gnutls_x509_crt_init: %s", gnutls_strerror(res));
       ret = U_ERROR;
