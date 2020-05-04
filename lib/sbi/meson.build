@@ -116,20 +116,23 @@ endif
 
 libmicrohttpd_dep = dependency('libmicrohttpd')
 libulfius_dep = cc.find_library('ulfius', required : true)
+liborcania_dep = cc.find_library('orcania', required : true)
 
 libsbi = library('ogssbi',
     sources : libsbi_sources,
     version : libogslib_version,
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
-    dependencies : [
-        libcore_dep, libmicrohttpd_dep, libulfius_dep
-    ],
+    dependencies : [libcore_dep,
+                    libmicrohttpd_dep,
+                    liborcania_dep,
+                    libulfius_dep],
     install : true)
 
 libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
-    dependencies : [
-        libcore_dep, libmicrohttpd_dep, libulfius_dep
-    ])
+    dependencies : [libcore_dep,
+                    libmicrohttpd_dep,
+                    liborcania_dep,
+                    libulfius_dep])
