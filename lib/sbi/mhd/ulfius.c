@@ -30,27 +30,6 @@
 #include "u_private.h"
 #include "ulfius.h"
 
-char * trimcharacter(char * str, char to_remove) {
-  char * end;
-
-  if (str == NULL) {
-    return NULL;
-  } else if(*str == 0) {
-    return str;
-  }
-
-  while(*str == to_remove) str++;
-
-  end = str + o_strlen(str) - 1;
-  while(end > str && (*end == to_remove)) {
-    end--;
-  }
-
-  *(end+1) = 0;
-
-  return str;
-}
-
 /** Define mock yder functions when yder is disabled **/
 int y_init_logs(const char * app, const unsigned long init_mode, const unsigned long init_level, const char * init_log_file, const char * message) {
   (void)(app);

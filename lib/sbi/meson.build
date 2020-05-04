@@ -19,6 +19,8 @@ libsbi_sources = files('''
     path.c
     init.c
 
+    mhd/memory.c
+    mhd/orcania.c
     mhd/u_map.c
     mhd/u_response.c
     mhd/ulfius.c
@@ -123,7 +125,6 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
     ])
 endif
 
-liborcania_dep = cc.find_library('orcania', required : true)
 libgnutls_dep = cc.find_library('gnutls', required : true)
 libmicrohttpd_dep = dependency('libmicrohttpd')
 libcurl_dep = dependency('libcurl')
@@ -134,7 +135,6 @@ libsbi = library('ogssbi',
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
-                    liborcania_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep],
@@ -144,7 +144,6 @@ libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
-                    liborcania_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep])
