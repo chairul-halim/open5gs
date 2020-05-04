@@ -33,10 +33,6 @@ extern int __nrf_log_domain;
 #define OGS_LOG_DOMAIN __nrf_log_domain
 
 typedef struct nrf_context_s {
-    ogs_queue_t     *queue;         /* Queue for processing UPF control */
-    ogs_timer_mgr_t *timer_mgr;     /* Timer Manager */
-    ogs_pollset_t   *pollset;       /* Poll Set for I/O Multiplexing */
-
     void                *NFProfileCollection;
     ogs_thread_mutex_t  db_lock;
 } nrf_context_t;

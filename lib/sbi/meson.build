@@ -114,9 +114,10 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
     ])
 endif
 
+liblibcurl_dep = cc.find_library('libcurl', required : true)
 libmicrohttpd_dep = dependency('libmicrohttpd')
-libulfius_dep = cc.find_library('ulfius', required : true)
 liborcania_dep = cc.find_library('orcania', required : true)
+libulfius_dep = cc.find_library('ulfius', required : true)
 
 libsbi = library('ogssbi',
     sources : libsbi_sources,
@@ -124,6 +125,7 @@ libsbi = library('ogssbi',
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
+                    liblibcurl_dep,
                     libmicrohttpd_dep,
                     liborcania_dep,
                     libulfius_dep],
@@ -133,6 +135,7 @@ libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
+                    liblibcurl_dep,
                     libmicrohttpd_dep,
                     liborcania_dep,
                     libulfius_dep])
