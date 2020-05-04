@@ -34,11 +34,8 @@
 
 #define ULFIUS_VERSION_NUMBER ((ULFIUS_VERSION_MAJOR << 16) | (ULFIUS_VERSION_MINOR << 8) | (ULFIUS_VERSION_PATCH << 0))
 
-/* #undef U_DISABLE_JANSSON */
 /* #undef U_DISABLE_CURL */
 /* #undef U_DISABLE_GNUTLS */
-/* #undef U_WITH_FREERTOS */
-/* #undef U_WITH_LWIP */
 
 #endif /* _ULFIUS_CFG_H_ */
 

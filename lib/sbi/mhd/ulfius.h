@@ -70,10 +70,6 @@ int y_set_logs_callback(void (* y_callback_log_message) (void * cls, const char 
 void y_log_message(const unsigned long type, const char * message, ...);
 int y_close_logs();
 
-#ifndef U_DISABLE_JANSSON
-#include <jansson.h>
-#endif
-
 /**
  * @defgroup const Constants
  * @{
@@ -1043,50 +1039,6 @@ char * ulfius_url_encode(const char * str);
  * struct _u_request, struct _u_response and struct _u_cookie management functions
  * @{
  */
-
-#ifndef U_DISABLE_JANSSON
-/**
- * ulfius_get_json_body_request
- * Get JSON structure from the request body if the request is valid
- * In case of an error in getting or parsing JSON data in the request,
- * the structure json_error_t * json_error will be filled with an error
- * message if json_error is not NULL
- * @param request the request to retrieve the JSON data
- * @param json_error a json_error_t reference that will contain decoding errors if any, may be NULL
- * @return a json_t * containing the JSON decoded, NULL on error
- */
-json_t * ulfius_get_json_body_request(const struct _u_request * request, json_error_t * json_error);
-
-/**
- * ulfius_set_json_body_request
- * Add a json_t j_body to a request
- * @param request the request to retrieve the JSON data
- * @param j_body a json_t to stringify in the body
- * @return U_OK on success
- */
-int ulfius_set_json_body_request(struct _u_request * request, json_t * j_body);
-
-/**
- * ulfius_get_json_body_response
- * Get JSON structure from the response body if the response is valid
- * In case of an error in getting or parsing JSON data in the response,
- * the structure json_error_t * json_error will be filled with an error
- * message if json_error is not NULL
- * @param response the response to retrieve the JSON data
- * @param json_error a json_error_t reference that will contain decoding errors if any, may be NULL
- * @return a json_t * containing the JSON decoded, NULL on error
- */
-json_t * ulfius_get_json_body_response(struct _u_response * response, json_error_t * json_error);
-
-/**
- * ulfius_set_json_body_response
- * Add a json_t j_body to a response
- * @param response the response to retrieve the JSON data
- * @param j_body a json_t to stringify in the body
- * @return U_OK on success
- */
-int ulfius_set_json_body_response(struct _u_response * response, const unsigned int status, const json_t * j_body);
-#endif
 
 /**
  * @}

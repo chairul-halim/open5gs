@@ -126,7 +126,6 @@ endif
 
 liborcania_dep = cc.find_library('orcania', required : true)
 libgnutls_dep = cc.find_library('gnutls', required : true)
-libjansson_dep = dependency('jansson')
 libmicrohttpd_dep = dependency('libmicrohttpd')
 libcurl_dep = dependency('libcurl')
 
@@ -137,7 +136,6 @@ libsbi = library('ogssbi',
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
                     liborcania_dep,
-                    libjansson_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep],
@@ -148,7 +146,6 @@ libsbi_dep = declare_dependency(
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
                     liborcania_dep,
-                    libjansson_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep])

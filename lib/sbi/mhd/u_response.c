@@ -626,47 +626,6 @@ int ulfius_set_stream_response(struct _u_response * response,
   }
 }
 
-#ifndef U_DISABLE_JANSSON
-/**
- * ulfius_set_json_body_response
- * Add a json_t j_body to a response
- * return U_OK on success
- */
-int ulfius_set_json_body_response(struct _u_response * response, const unsigned int status, const json_t * j_body) {
-  if (response != NULL && j_body != NULL && (json_is_array(j_body) || json_is_object(j_body))) {
-    // Free all the bodies available
-    o_free(response->binary_body);
-    response->binary_body = NULL;
-    response->binary_body_length = 0;
-
-    response->binary_body = (void*) json_dumps(j_body, JSON_COMPACT);
-    if (response->binary_body == NULL) {
-      y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for response->binary_body");
-      return U_ERROR_MEMORY;
-    }
-    response->binary_body_length = o_strlen((char*)response->binary_body);
-    response->status = status;
-    u_map_put(response->map_header, ULFIUS_HTTP_HEADER_CONTENT, ULFIUS_HTTP_ENCODING_JSON);
-    return U_OK;
-  } else {
-    return U_ERROR_PARAMS;
-  }
-}
-
-/**
- * ulfius_get_json_body_response
- * Get JSON structure from the request body if the request is valid
- * request: struct _u_request used
- * json_error: structure to store json_error_t if specified
- */
-json_t * ulfius_get_json_body_response(struct _u_response * response, json_error_t * json_error) {
-  if (response != NULL && response->map_header != NULL && NULL != o_strstr(u_map_get_case(response->map_header, ULFIUS_HTTP_HEADER_CONTENT), ULFIUS_HTTP_ENCODING_JSON)) {
-    return json_loadb(response->binary_body, response->binary_body_length, JSON_DECODE_ANY, json_error);
-  }
-  return NULL;
-}
-#endif
-
 /**
  * ulfius_add_header_to_response
  * add a header to the response
