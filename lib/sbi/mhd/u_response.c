@@ -161,23 +161,27 @@ static char * ulfius_generate_cookie_header(const struct _u_cookie * cookie) {
  * adds headers defined in the response_map_header to the response
  * return the number of added headers, -1 on error
  */
-int ulfius_set_response_header(struct MHD_Response * response, const struct _u_map * response_map_header) {
-  const char ** header_keys = u_map_enum_keys(response_map_header);
-  const char * header_value;
-  int i = -1, ret;
-  if (header_keys != NULL && response != NULL && response_map_header != NULL) {
-    for (i=0; header_keys != NULL && header_keys[i] != NULL; i++) {
-      header_value = u_map_get(response_map_header, header_keys[i]);
-      if (header_value != NULL) {
-        ret = MHD_add_response_header (response, header_keys[i], header_value);
-        if (ret == MHD_NO) {
-          i = -1;
-          break;
+int ulfius_set_response_header(struct MHD_Response *response,
+        const struct _u_map *response_map_header)
+{
+    const char **header_keys = u_map_enum_keys(response_map_header);
+    const char *header_value;
+    int i = -1, ret;
+    if (header_keys != NULL &&
+            response != NULL && response_map_header != NULL) {
+        for (i = 0; header_keys != NULL && header_keys[i] != NULL; i++) {
+            header_value = u_map_get(response_map_header, header_keys[i]);
+            if (header_value != NULL) {
+                ret = MHD_add_response_header(response,
+                        header_keys[i], header_value);
+                if (ret == MHD_NO) {
+                    i = -1;
+                    break;
+                }
+            }
         }
-      }
     }
-  }
-  return i;
+    return i;
 }
 
 /**
@@ -393,13 +397,14 @@ int ulfius_clean_response(struct _u_response * response) {
  * clean the specified response and all its elements
  * return U_OK on success
  */
-int ulfius_clean_response_full(struct _u_response * response) {
-  if (ulfius_clean_response(response) == U_OK) {
-    o_free(response);
-    return U_OK;
-  } else {
-    return U_ERROR_PARAMS;
-  }
+int ulfius_clean_response_full(struct _u_response * response)
+{
+    if (ulfius_clean_response(response) == U_OK) {
+        o_free(response);
+        return U_OK;
+    } else {
+        return U_ERROR_PARAMS;
+    }
 }
 
 /**
@@ -407,34 +412,36 @@ int ulfius_clean_response_full(struct _u_response * response) {
  * Initialize a response structure by allocating inner elements
  * return U_OK on success
  */
-int ulfius_init_response(struct _u_response * response) {
-  if (response != NULL) {
-    response->status = 200;
-    response->map_header = o_malloc(sizeof(struct _u_map));
-    if (response->map_header == NULL) {
-      y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for response->map_header");
-      return U_ERROR_MEMORY;
+int ulfius_init_response(struct _u_response *response)
+{
+    if (response != NULL) {
+        response->status = 200;
+        response->map_header = o_malloc(sizeof(struct _u_map));
+        if (response->map_header == NULL) {
+            y_log_message(Y_LOG_LEVEL_ERROR,
+                "Ulfius - Error allocating memory for response->map_header");
+            return U_ERROR_MEMORY;
+        }
+        if (u_map_init(response->map_header) != U_OK) {
+            return U_ERROR_PARAMS;
+        }
+        response->auth_realm = NULL;
+        response->map_cookie = NULL;
+        response->nb_cookies = 0;
+        response->protocol = NULL;
+        response->binary_body = NULL;
+        response->binary_body_length = 0;
+        response->stream_callback = NULL;
+        response->stream_size = U_STREAM_SIZE_UNKOWN;
+        response->stream_block_size = ULFIUS_STREAM_BLOCK_SIZE_DEFAULT;
+        response->stream_callback_free = NULL;
+        response->stream_user_data = NULL;
+        response->timeout = 0;
+        response->shared_data = NULL;
+        return U_OK;
+    } else {
+        return U_ERROR_PARAMS;
     }
-    if (u_map_init(response->map_header) != U_OK) {
-      return U_ERROR_PARAMS;
-    }
-    response->auth_realm = NULL;
-    response->map_cookie = NULL;
-    response->nb_cookies = 0;
-    response->protocol = NULL;
-    response->binary_body = NULL;
-    response->binary_body_length = 0;
-    response->stream_callback = NULL;
-    response->stream_size = U_STREAM_SIZE_UNKOWN;
-    response->stream_block_size = ULFIUS_STREAM_BLOCK_SIZE_DEFAULT;
-    response->stream_callback_free = NULL;
-    response->stream_user_data = NULL;
-    response->timeout = 0;
-    response->shared_data = NULL;
-    return U_OK;
-  } else {
-    return U_ERROR_PARAMS;
-  }
 }
 
 /**

@@ -96,30 +96,34 @@ static int ulfius_fill_map_check_utf8(void *cls, enum MHD_ValueKind kind,
 /**
  * Fill a map with the key/values specified
  */
-static int ulfius_fill_map(void * cls, enum MHD_ValueKind kind, const char * key, const char * value) {
-  char * tmp;
-  int res;
-  UNUSED(kind);
-  
-  if (cls == NULL || key == NULL) {
-    // Invalid parameters
-    y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error invalid parameters for ulfius_fill_map");
-    return MHD_NO;
-  } else if (u_map_get(((struct _u_map *)cls), key) != NULL) {
-    // u_map already has a value with this this key, appending value separated with a comma ',')
-    tmp = msprintf("%s,%s", u_map_get(((struct _u_map *)cls), key), (value==NULL?"":value));
-    res = u_map_put(((struct _u_map *)cls), key, tmp);
-    o_free(tmp);
-    if (res == U_OK) {
-      return MHD_YES;
+static int ulfius_fill_map(void *cls, enum MHD_ValueKind kind,
+        const char *key, const char *value) {
+    char * tmp;
+    int res;
+    UNUSED(kind);
+
+    if (cls == NULL || key == NULL) {
+        // Invalid parameters
+        y_log_message(Y_LOG_LEVEL_ERROR,
+                "Ulfius - Error invalid parameters for ulfius_fill_map");
+        return MHD_NO;
+    } else if (u_map_get(((struct _u_map *)cls), key) != NULL) {
+        // u_map already has a value with this this key,
+        // appending value separated with a comma ',')
+        tmp = msprintf("%s,%s", u_map_get(((struct _u_map *)cls), key), (value==NULL?"":value));
+        res = u_map_put(((struct _u_map *)cls), key, tmp);
+        o_free(tmp);
+        if (res == U_OK) {
+            return MHD_YES;
+        } else {
+            return MHD_NO;
+        }
+    } else if (u_map_put(((struct _u_map *)cls), key,
+                (value==NULL ? "" : value)) == U_OK) {
+        return MHD_YES;
     } else {
-      return MHD_NO;
+        return MHD_NO;
     }
-  } else if (u_map_put(((struct _u_map *)cls), key, (value==NULL?"":value)) == U_OK) {
-    return MHD_YES;
-  } else {
-    return MHD_NO;
-  }
 }
 
 /**
@@ -244,32 +248,38 @@ static void *ulfius_uri_logger(void *cls, const char *uri)
  * Copy it in newly allocated response_buffer and set the size in response_buffer_len
  * return U_OK on success
  */
-static int ulfius_get_body_from_response(struct _u_response * response, void ** response_buffer, size_t * response_buffer_len) {
-  if (response == NULL || response_buffer == NULL || response_buffer_len == NULL) {
-    return U_ERROR_PARAMS;
-  } else {
-    if (response->binary_body != NULL && response->binary_body_length > 0) {
-      // The user sent a binary response
-      *response_buffer = o_malloc(response->binary_body_length);
-      if (*response_buffer == NULL) {
-        y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for response_buffer");
-        response->status = MHD_HTTP_INTERNAL_SERVER_ERROR;
-        response->binary_body = o_strdup(ULFIUS_HTTP_ERROR_BODY);
-        response->binary_body_length = ogs_strlen(ULFIUS_HTTP_ERROR_BODY);
-        if (response->binary_body == NULL) {
-          y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for response->binary_body");
-          return U_ERROR_MEMORY;
-        }
-      } else {
-        memcpy(*response_buffer, response->binary_body, response->binary_body_length);
-        *response_buffer_len = response->binary_body_length;
-      }
+static int ulfius_get_body_from_response(struct _u_response *response,
+        void **response_buffer, size_t *response_buffer_len) {
+    if (response == NULL || response_buffer == NULL ||
+            response_buffer_len == NULL) {
+        return U_ERROR_PARAMS;
     } else {
-      *response_buffer = NULL;
-      *response_buffer_len = 0;
+        if (response->binary_body != NULL && response->binary_body_length > 0) {
+            // The user sent a binary response
+            *response_buffer = o_malloc(response->binary_body_length);
+            if (*response_buffer == NULL) {
+                y_log_message(Y_LOG_LEVEL_ERROR,
+                        "Ulfius - Error allocating memory for response_buffer");
+                response->status = MHD_HTTP_INTERNAL_SERVER_ERROR;
+                response->binary_body = o_strdup(ULFIUS_HTTP_ERROR_BODY);
+                response->binary_body_length = ogs_strlen(ULFIUS_HTTP_ERROR_BODY);
+                if (response->binary_body == NULL) {
+                    y_log_message(Y_LOG_LEVEL_ERROR,
+                            "Ulfius - Error allocating memory "
+                            "for response->binary_body");
+                    return U_ERROR_MEMORY;
+                }
+            } else {
+                memcpy(*response_buffer,
+                        response->binary_body, response->binary_body_length);
+                *response_buffer_len = response->binary_body_length;
+            }
+        } else {
+            *response_buffer = NULL;
+            *response_buffer_len = 0;
+        }
+        return U_OK;
     }
-    return U_OK;
-  }
 }
 
 /**
@@ -311,9 +321,9 @@ static int mhd_iterate_post_data(void *coninfo_cls,
         const char *data, uint64_t off, size_t size)
 {
   
-    struct connection_info_struct * con_info = coninfo_cls;
+    struct connection_info_struct *con_info = coninfo_cls;
     size_t cur_size = size;
-    char * data_dup, * filename_param;
+    char *data_dup, *filename_param;
     UNUSED(kind);
 
     if (filename != NULL && con_info->u_instance != NULL &&
@@ -632,8 +642,8 @@ static int ulfius_webservice_dispatcher(void *cls,
                     MHD_basic_auth_get_username_password(
                         connection, &con_info->request->auth_basic_password);
 
-                for (i = 0;
-                        current_endpoint_list[i] != NULL && !close_loop; i++) {
+                for (i = 0; current_endpoint_list[i] != NULL &&
+                        !close_loop; i++) {
                     current_endpoint = current_endpoint_list[i];
                     u_map_empty(con_info->request->map_url);
                     u_map_copy_into(con_info->request->map_url,
@@ -1012,7 +1022,7 @@ int ulfius_start_framework(struct _u_instance * u_instance)
  * return U_OK on success
  */
 int ulfius_start_secure_framework(struct _u_instance *u_instance,
-        const char * key_pem, const char * cert_pem)
+        const char *key_pem, const char *cert_pem)
 {
     return ulfius_start_secure_ca_trust_framework(u_instance,
             key_pem, cert_pem, NULL);

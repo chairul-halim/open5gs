@@ -137,27 +137,28 @@ static char from_hex(char ch) {
  * Thanks Geek Hideout!
  * http://www.geekhideout.com/urlcode.shtml
  */
-static char * url_decode(const char * str) {
-  if (str != NULL) {
-    char * pstr = (char*)str, * buf = malloc(strlen(str) + 1), * pbuf = buf;
-    while (* pstr) {
-      if (* pstr == '%') {
-        if (pstr[1] && pstr[2]) {
-          * pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
-          pstr += 2;
+static char *url_decode(const char * str)
+{
+    if (str != NULL) {
+        char *pstr = (char*)str, * buf = malloc(strlen(str) + 1), * pbuf = buf;
+        while (*pstr) {
+            if (*pstr == '%') {
+                if (pstr[1] && pstr[2]) {
+                    *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
+                    pstr += 2;
+                }
+            } else if (*pstr == '+') {
+                *pbuf++ = ' ';
+            } else {
+                *pbuf++ = * pstr;
+            }
+            pstr++;
         }
-      } else if (* pstr == '+') { 
-        * pbuf++ = ' ';
-      } else {
-        * pbuf++ = * pstr;
-      }
-      pstr++;
+        *pbuf = '\0';
+        return buf;
+    } else {
+        return NULL;
     }
-    * pbuf = '\0';
-    return buf;
-  } else {
-    return NULL;
-  }
 }
 
 /**
@@ -224,70 +225,90 @@ struct _u_endpoint ** ulfius_endpoint_match(const char * method, const char * ur
  * fills map with the keys/values defined in the url that are described in the endpoint format url
  * return U_OK on success
  */
-int ulfius_parse_url(const char * url, const struct _u_endpoint * endpoint, struct _u_map * map, int check_utf8) {
-  char * saveptr = NULL, * cur_word = NULL, * url_cpy = NULL, * url_cpy_addr = NULL;
-  char * saveptr_format = NULL, * saveptr_prefix = NULL, * cur_word_format = NULL, * url_format_cpy = NULL, * url_format_cpy_addr = NULL, * concat_url_param = NULL;
+int ulfius_parse_url(const char *url, const struct _u_endpoint *endpoint,
+        struct _u_map *map, int check_utf8)
+{
+    char *saveptr = NULL, *cur_word = NULL;
+    char *url_cpy = NULL, *url_cpy_addr = NULL;
+    char *saveptr_format = NULL, *saveptr_prefix = NULL;
+    char *cur_word_format = NULL, * url_format_cpy = NULL;
+    char *url_format_cpy_addr = NULL, *concat_url_param = NULL;
 
-  if (map != NULL && endpoint != NULL) {
-    url_cpy = url_cpy_addr = o_strdup(url);
-    url_format_cpy = url_format_cpy_addr = o_strdup(endpoint->url_prefix);
-    cur_word = url_decode(strtok_r( url_cpy, ULFIUS_URL_SEPARATOR, &saveptr ));
-    if (endpoint->url_prefix != NULL && url_format_cpy == NULL) {
-      y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for url_format_cpy");
-    } else if (url_format_cpy != NULL) {
-      cur_word_format = strtok_r( url_format_cpy, ULFIUS_URL_SEPARATOR, &saveptr_prefix );
-    }
-    while (cur_word_format != NULL && cur_word != NULL) {
-      // Ignoring url_prefix words
-      o_free(cur_word);
-      cur_word = url_decode(strtok_r( NULL, ULFIUS_URL_SEPARATOR, &saveptr ));
-      cur_word_format = strtok_r( NULL, ULFIUS_URL_SEPARATOR, &saveptr_prefix );
-    }
-    o_free(url_format_cpy_addr);
-    
-    url_format_cpy = url_format_cpy_addr = o_strdup(endpoint->url_format);
-    if (endpoint->url_format != NULL && url_format_cpy == NULL) {
-      y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating memory for url_format_cpy");
-      return U_ERROR_MEMORY;
-    } else if (url_format_cpy != NULL) {
-      cur_word_format = strtok_r( url_format_cpy, ULFIUS_URL_SEPARATOR, &saveptr_format );
-    }
-    while (cur_word_format != NULL && cur_word != NULL) {
-      if ((cur_word_format[0] == ':' || cur_word_format[0] == '@') && (!check_utf8 || utf8_check(cur_word) == NULL)) {
-        if (u_map_has_key(map, cur_word_format+1)) {
-          concat_url_param = msprintf("%s,%s", u_map_get(map, cur_word_format+1), cur_word);
-          if (concat_url_param == NULL) {
-            y_log_message(Y_LOG_LEVEL_ERROR, "Ulfius - Error allocating resources for concat_url_param");
-            o_free(url_cpy_addr);
-            o_free(url_format_cpy_addr);
-            return U_ERROR_MEMORY;
-          } else if (u_map_put(map, cur_word_format+1, concat_url_param) != U_OK) {
-            url_cpy_addr = NULL;
-            url_format_cpy_addr = NULL;
-            return U_ERROR_MEMORY;
-          }
-          o_free(concat_url_param);
-        } else {
-          if (u_map_put(map, cur_word_format+1, cur_word) != U_OK) {
-            url_cpy_addr = NULL;
-            url_format_cpy_addr = NULL;
-            return U_ERROR_MEMORY;
-          }
+    if (map != NULL && endpoint != NULL) {
+        url_cpy = url_cpy_addr = o_strdup(url);
+        url_format_cpy = url_format_cpy_addr = o_strdup(endpoint->url_prefix);
+        cur_word = url_decode(
+                strtok_r(url_cpy, ULFIUS_URL_SEPARATOR, &saveptr));
+        if (endpoint->url_prefix != NULL && url_format_cpy == NULL) {
+            y_log_message(Y_LOG_LEVEL_ERROR,
+                    "Ulfius - Error allocating memory for url_format_cpy");
+        } else if (url_format_cpy != NULL) {
+            cur_word_format = strtok_r(url_format_cpy,
+                    ULFIUS_URL_SEPARATOR, &saveptr_prefix );
         }
-      }
-      o_free(cur_word);
-      cur_word = url_decode(strtok_r( NULL, ULFIUS_URL_SEPARATOR, &saveptr ));
-      cur_word_format = strtok_r( NULL, ULFIUS_URL_SEPARATOR, &saveptr_format );
+        while (cur_word_format != NULL && cur_word != NULL) {
+            // Ignoring url_prefix words
+            o_free(cur_word);
+            cur_word = url_decode(
+                    strtok_r(NULL, ULFIUS_URL_SEPARATOR, &saveptr));
+            cur_word_format = strtok_r(
+                    NULL, ULFIUS_URL_SEPARATOR, &saveptr_prefix);
+        }
+        o_free(url_format_cpy_addr);
+
+        url_format_cpy = url_format_cpy_addr = o_strdup(endpoint->url_format);
+        if (endpoint->url_format != NULL && url_format_cpy == NULL) {
+            y_log_message(Y_LOG_LEVEL_ERROR,
+                    "Ulfius - Error allocating memory for url_format_cpy");
+            return U_ERROR_MEMORY;
+        } else if (url_format_cpy != NULL) {
+            cur_word_format = strtok_r(
+                    url_format_cpy, ULFIUS_URL_SEPARATOR, &saveptr_format);
+        }
+        while (cur_word_format != NULL && cur_word != NULL) {
+            if ((cur_word_format[0] == ':' || cur_word_format[0] == '@') &&
+                    (!check_utf8 || utf8_check(cur_word) == NULL)) {
+                if (u_map_has_key(map, cur_word_format+1)) {
+                    concat_url_param = msprintf("%s,%s",
+                            u_map_get(map, cur_word_format+1), cur_word);
+                    if (concat_url_param == NULL) {
+                        y_log_message(Y_LOG_LEVEL_ERROR,
+                                "Ulfius - Error allocating resources "
+                                "for concat_url_param");
+                        o_free(url_cpy_addr);
+                        o_free(url_format_cpy_addr);
+                        return U_ERROR_MEMORY;
+                    } else if (u_map_put(map, cur_word_format+1,
+                                concat_url_param) != U_OK) {
+                        url_cpy_addr = NULL;
+                        url_format_cpy_addr = NULL;
+                        return U_ERROR_MEMORY;
+                    }
+                    o_free(concat_url_param);
+                } else {
+                    if (u_map_put(map,
+                                cur_word_format+1, cur_word) != U_OK) {
+                        url_cpy_addr = NULL;
+                        url_format_cpy_addr = NULL;
+                        return U_ERROR_MEMORY;
+                    }
+                }
+            }
+            o_free(cur_word);
+            cur_word = url_decode(strtok_r(
+                        NULL, ULFIUS_URL_SEPARATOR, &saveptr ));
+            cur_word_format = strtok_r(
+                        NULL, ULFIUS_URL_SEPARATOR, &saveptr_format );
+        }
+        o_free(cur_word);
+        o_free(url_cpy_addr);
+        o_free(url_format_cpy_addr);
+        url_cpy_addr = NULL;
+        url_format_cpy_addr = NULL;
+        return U_OK;
+    } else {
+        return U_ERROR_PARAMS;
     }
-    o_free(cur_word);
-    o_free(url_cpy_addr);
-    o_free(url_format_cpy_addr);
-    url_cpy_addr = NULL;
-    url_format_cpy_addr = NULL;
-    return U_OK;
-  } else {
-    return U_ERROR_PARAMS;
-  }
 }
 
 /**
