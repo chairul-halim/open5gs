@@ -19,7 +19,7 @@
 
 #include "ogs-sbi.h"
 
-#include "mhd/ulfius.h"
+#include "ulfius/ulfius.h"
 
 #define PREFIX "/test"
 #define PREFIXJSON "/testjson"
