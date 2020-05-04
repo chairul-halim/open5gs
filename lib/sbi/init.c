@@ -31,35 +31,35 @@ int __ogs_sbi_domain;
 
 static struct _u_instance instance;
 
-char * print_map(const struct _u_map * map)
+char *print_map(const struct _u_map *map)
 {
-  char * line, * to_return = NULL;
-  const char **keys, * value;
-  int len, i;
-  if (map != NULL) {
-    keys = u_map_enum_keys(map);
-    for (i=0; keys[i] != NULL; i++) {
-      value = u_map_get(map, keys[i]);
-      len = snprintf(NULL, 0, "key is %s, value is %s", keys[i], value);
-      line = o_malloc((len+1)*sizeof(char));
-      snprintf(line, (len+1), "key is %s, value is %s", keys[i], value);
-      if (to_return != NULL) {
-        len = ogs_strlen(to_return) + ogs_strlen(line) + 1;
-        to_return = o_realloc(to_return, (len+1)*sizeof(char));
-        if (ogs_strlen(to_return) > 0) {
-          strcat(to_return, "\n");
+    char *line, *to_return = NULL;
+    const char **keys, *value;
+    int len, i;
+    if (map != NULL) {
+        keys = u_map_enum_keys(map);
+        for (i = 0; keys[i] != NULL; i++) {
+            value = u_map_get(map, keys[i]);
+            len = snprintf(NULL, 0, "key is %s, value is %s", keys[i], value);
+            line = o_malloc((len+1)*sizeof(char));
+            snprintf(line, (len+1), "key is %s, value is %s", keys[i], value);
+            if (to_return != NULL) {
+                len = ogs_strlen(to_return) + ogs_strlen(line) + 1;
+                to_return = o_realloc(to_return, (len+1)*sizeof(char));
+                if (ogs_strlen(to_return) > 0) {
+                    strcat(to_return, "\n");
+                }
+            } else {
+                to_return = o_malloc((ogs_strlen(line) + 1)*sizeof(char));
+                to_return[0] = 0;
+            }
+            strcat(to_return, line);
+            o_free(line);
         }
-      } else {
-        to_return = o_malloc((ogs_strlen(line) + 1)*sizeof(char));
-        to_return[0] = 0;
-      }
-      strcat(to_return, line);
-      o_free(line);
+        return to_return;
+    } else {
+        return NULL;
     }
-    return to_return;
-  } else {
-    return NULL;
-  }
 }
 
 int callback_get_test (const struct _u_request * request,
@@ -89,23 +89,28 @@ int callback_post_test (const struct _u_request * request,
     return U_CALLBACK_CONTINUE;
 }
 
-int callback_all_test_foo (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  char * url_params = print_map(request->map_url), * headers = print_map(request->map_header), * cookies = print_map(request->map_cookie),
-        * post_params = print_map(request->map_post_body);
-#ifndef _WIN32
-  char * response_body = msprintf("Hello World!\n\n  method is %s\n  url is %s\n\n  parameters from the url are \n%s\n\n  cookies are \n%s\n\n  headers are \n%s\n\n  post parameters are \n%s\n\n  user data is %s\n\nclient address is %s\n\n",
-                                  request->http_verb, request->http_url, url_params, cookies, headers, post_params, (char *)user_data, inet_ntoa(((struct sockaddr_in *)request->client_address)->sin_addr));
-#else
-  char * response_body = msprintf("Hello World!\n\n  method is %s\n  url is %s\n\n  parameters from the url are \n%s\n\n  cookies are \n%s\n\n  headers are \n%s\n\n  post parameters are \n%s\n\n  user data is %s\n\n",
-                                  request->http_verb, request->http_url, url_params, cookies, headers, post_params, (char *)user_data);
-#endif
-  ulfius_set_string_body_response(response, 200, response_body);
-  o_free(url_params);
-  o_free(headers);
-  o_free(cookies);
-  o_free(post_params);
-  o_free(response_body);
-  return U_CALLBACK_CONTINUE;
+int callback_all_test_foo(const struct _u_request *request,
+        struct _u_response *response, void *user_data) {
+    char *url_params = print_map(request->map_url);
+    char *headers = print_map(request->map_header);
+    char *cookies = print_map(request->map_cookie);
+    char *post_params = print_map(request->map_post_body);
+
+    char *response_body = msprintf("Hello World!\n\n  method is %s\n  "
+        "url is %s\n\n  parameters from the url are \n%s\n\n  "
+        "cookies are \n%s\n\n  headers are \n%s\n\n  "
+        "post parameters are \n%s\n\n  user data is %s\n\n"
+        "client address is %s\n\n",
+        request->http_verb, request->http_url, url_params,
+        cookies, headers, post_params, (char *)user_data,
+        inet_ntoa(((struct sockaddr_in *)request->client_address)->sin_addr));
+    ulfius_set_string_body_response(response, 200, response_body);
+    o_free(url_params);
+    o_free(headers);
+    o_free(cookies);
+    o_free(post_params);
+    o_free(response_body);
+    return U_CALLBACK_CONTINUE;
 }
 
 int ogs_sbi_init(uint16_t port)
@@ -118,12 +123,19 @@ int ogs_sbi_init(uint16_t port)
         return OGS_ERROR;
     }
 
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, NULL, 0, &callback_get_test, NULL);
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/empty", 0, &callback_get_empty_response, NULL);
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/multiple/:multiple/:multiple/:not_multiple", 0, &callback_all_test_foo, NULL);
-    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX, NULL, 0, &callback_post_test, NULL);
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/param/:foo", 0, &callback_all_test_foo, "user data 1");
-    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX, "/param/:foo", 0, &callback_all_test_foo, "user data 2");
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX,
+            NULL, 0, &callback_get_test, NULL);
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX,
+            "/empty", 0, &callback_get_empty_response, NULL);
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX,
+            "/multiple/:multiple/:multiple/:not_multiple", 0,
+            &callback_all_test_foo, NULL);
+    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX,
+            NULL, 0, &callback_post_test, NULL);
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX,
+            "/param/:foo", 0, &callback_all_test_foo, "user data 1");
+    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX,
+            "/param/:foo", 0, &callback_all_test_foo, "user data 2");
 
     rv = ulfius_start_framework(&instance);
     if (rv != OGS_OK) {

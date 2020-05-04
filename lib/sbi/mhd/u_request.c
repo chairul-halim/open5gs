@@ -394,13 +394,14 @@ int ulfius_clean_request(struct _u_request * request) {
  * clean the specified request and all its elements
  * return U_OK on success
  */
-int ulfius_clean_request_full(struct _u_request * request) {
-  if (ulfius_clean_request(request) == U_OK) {
-    o_free(request);
-    return U_OK;
-  } else {
-    return U_ERROR_PARAMS;
-  }
+int ulfius_clean_request_full(struct _u_request *request)
+{
+    if (ulfius_clean_request(request) == U_OK) {
+        o_free(request);
+        return U_OK;
+    } else {
+        return U_ERROR_PARAMS;
+    }
 }
 
 /**

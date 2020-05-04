@@ -294,37 +294,62 @@ struct _u_endpoint {
  * 
  */
 struct _u_instance {
-  struct MHD_Daemon          *  mhd_daemon; /* !< pointer to the libmicrohttpd daemon */
-  int                           status; /* !< status of the current instance, status are U_STATUS_STOP, U_STATUS_RUNNING or U_STATUS_ERROR */
-  unsigned int                  port; /* !< port number to listen to */
+  struct MHD_Daemon *mhd_daemon; /* !< pointer to the libmicrohttpd daemon */
+  int status; /* !< status of the current instance, 
+                 status are U_STATUS_STOP, U_STATUS_RUNNING or U_STATUS_ERROR */
+  unsigned int port; /* !< port number to listen to */
 #if MHD_VERSION >= 0x00095208
-  unsigned short                network_type; /* !< Listen to ipv4 and or ipv6 connections, values available are U_USE_ALL, U_USE_IPV4 or U_USE_IPV6 */
+  unsigned short network_type; /* !< Listen to ipv4 and or ipv6 connections,
+                                  values available are U_USE_ALL, U_USE_IPV4
+                                  or U_USE_IPV6 */
 #endif
-  struct sockaddr_in          * bind_address; /* !< ipv4 address to listen to (optional) */
-  struct sockaddr_in6         * bind_address6; /* !< ipv6 address to listen to (optional) */
-  unsigned int                  timeout; /* !< Timeout to close the connection because of inactivity between the client and the server */
-  int                           nb_endpoints; /* !< Number of available endpoints */
-  char                        * default_auth_realm; /* !< Default realm on authentication error */
-  struct _u_endpoint          * endpoint_list; /* !< List of available endpoints */
-  struct _u_endpoint          * default_endpoint; /* !< Default endpoint if no other endpoint match the current url */
-  struct _u_map               * default_headers; /* !< Default headers that will be added to all response->map_header */
-  size_t                        max_post_param_size; /* !< maximum size for a post parameter, 0 means no limit, default 0 */
-  size_t                        max_post_body_size; /* !< maximum size for the entire post body, 0 means no limit, default 0 */
-  void                        * websocket_handler; /* !< handler for the websocket structure */
-  int                        (* file_upload_callback) (const struct _u_request * request,  /* !< callback function to manage file upload by blocks */
-                                                       const char * key, 
-                                                       const char * filename, 
-                                                       const char * content_type, 
-                                                       const char * transfer_encoding, 
-                                                       const char * data, 
-                                                       uint64_t off, 
-                                                       size_t size, 
-                                                       void * cls);
-  void                        * file_upload_cls; /* !< any pointer to pass to the file_upload_callback function */
-  int                           mhd_response_copy_data; /* !< to choose between MHD_RESPMEM_MUST_COPY and MHD_RESPMEM_MUST_FREE, only if you use MHD < 0.9.61, otherwise this option is skipped because it's useless */
-  int                           check_utf8; /* !< check that all parameters values in the request (url, header and post_body), are valid utf8 strings, if a parameter value has non utf8 character, the value, will be ignored, default 1 */
+  struct sockaddr_in *bind_address; /* !< ipv4 address to listen
+                                       to (optional) */
+  struct sockaddr_in6 *bind_address6; /* !< ipv6 address to listen
+                                         to (optional) */
+  unsigned int timeout; /* !< Timeout to close the connection
+                           because of inactivity between the client and
+                           the server */
+  int nb_endpoints; /* !< Number of available endpoints */
+  char *default_auth_realm; /* !< Default realm on authentication error */
+  struct _u_endpoint *endpoint_list; /* !< List of available endpoints */
+  struct _u_endpoint *default_endpoint; /* !< Default endpoint
+                                           if no other endpoint match
+                                           the current url */
+  struct _u_map *default_headers; /* !< Default headers that will be added
+                                     to all response->map_header */
+  size_t max_post_param_size; /* !< maximum size for a post parameter,
+                                 0 means no limit, default 0 */
+  size_t max_post_body_size; /* !< maximum size for the entire post body,
+                                0 means no limit, default 0 */
+  void *websocket_handler; /* !< handler for the websocket structure */
+  int (*file_upload_callback) (
+      const struct _u_request * request,  /* !< callback function
+                                             to manage file upload by blocks */
+      const char *key, 
+      const char *filename, 
+      const char *content_type, 
+      const char *transfer_encoding, 
+      const char *data, 
+      uint64_t off, 
+      size_t size, 
+      void *cls);
+  void * file_upload_cls; /* !< any pointer to pass
+                             to the file_upload_callback function */
+  int mhd_response_copy_data; /* !< to choose between MHD_RESPMEM_MUST_COPY
+                                 and MHD_RESPMEM_MUST_FREE, only if you use
+                                 MHD < 0.9.61, otherwise this option is
+                                 skipped because it's useless */
+  int check_utf8; /* !< check that all parameters values
+                     in the request (url, header and post_body),
+                     are valid utf8 strings, if a parameter value
+                     has non utf8 character, the value, will be ignored,
+                     default 1 */
 #ifndef U_DISABLE_GNUTLS
-  int                           use_client_cert_auth; /* !< Internal variable use to indicate if the instance uses client certificate authentication, Do not change this value, available only if websocket support is enabled */
+  int use_client_cert_auth; /* !< Internal variable use to indicate
+                               if the instance uses client certificate
+                               authentication, Do not change this value,
+                               available only if websocket support is enabled */
 #endif
 };
 
@@ -336,13 +361,13 @@ struct _u_instance {
  * Structures used to facilitate data manipulations (internal)
  */
 struct connection_info_struct {
-  struct _u_instance       * u_instance;
-  struct MHD_PostProcessor * post_processor;
-  int                        has_post_processor;
-  int                        callback_first_iteration;
-  struct _u_request        * request;
-  size_t                     max_post_param_size;
-  struct _u_map              map_url_initial;
+  struct _u_instance       *u_instance;
+  struct MHD_PostProcessor *post_processor;
+  int                       has_post_processor;
+  int                       callback_first_iteration;
+  struct _u_request        *request;
+  size_t                    max_post_param_size;
+  struct _u_map             map_url_initial;
 };
 
 /**********************************
