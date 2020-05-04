@@ -50,11 +50,6 @@ extern "C"
 /** Angharad libraries **/
 #include <orcania.h>
 
-/** To disable all yder log messages, this flag must be enabled **/
-#ifndef U_DISABLE_YDER
-  #include <yder.h>
-#else
-
 #define Y_LOG_MODE_NONE     0
 #define Y_LOG_MODE_CONSOLE  0
 #define Y_LOG_MODE_SYSLOG   0
@@ -74,7 +69,6 @@ int y_init_logs(const char * app, const unsigned long init_mode, const unsigned 
 int y_set_logs_callback(void (* y_callback_log_message) (void * cls, const char * app_name, const time_t date, const unsigned long level, const char * message), void * cls, const char * message);
 void y_log_message(const unsigned long type, const char * message, ...);
 int y_close_logs();
-#endif
 
 #ifndef U_DISABLE_JANSSON
 #include <jansson.h>

@@ -125,7 +125,6 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
 endif
 
 liborcania_dep = cc.find_library('orcania', required : true)
-libyder_dep = cc.find_library('yder', required : true)
 libgnutls_dep = cc.find_library('gnutls', required : true)
 libjansson_dep = dependency('jansson')
 libmicrohttpd_dep = dependency('libmicrohttpd')
@@ -138,7 +137,6 @@ libsbi = library('ogssbi',
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
                     liborcania_dep,
-                    libyder_dep,
                     libjansson_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
@@ -150,7 +148,6 @@ libsbi_dep = declare_dependency(
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
                     liborcania_dep,
-                    libyder_dep,
                     libjansson_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,

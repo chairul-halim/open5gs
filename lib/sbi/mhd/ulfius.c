@@ -31,7 +31,6 @@
 #include "ulfius.h"
 
 /** Define mock yder functions when yder is disabled **/
-#ifdef U_DISABLE_YDER
 int y_init_logs(const char * app, const unsigned long init_mode, const unsigned long init_level, const char * init_log_file, const char * message) {
   (void)(app);
   (void)(init_mode);
@@ -56,7 +55,6 @@ void y_log_message(const unsigned long type, const char * message, ...) {
 int y_close_logs() {
   return 1;
 }
-#endif
 
 /**
  * Fill a map with the key/values specified
