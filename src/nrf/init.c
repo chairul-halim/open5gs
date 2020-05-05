@@ -61,11 +61,13 @@ ahc_echo (void *cls,
 int ogs_mhd_server(void);
 static struct MHD_Daemon *d;
 
-static void _server_recv_cb(short when, ogs_socket_t fd, void *data)
+static void mhd_recv_cb(short when, ogs_socket_t fd, void *data)
 {
-}
-static void _client_recv_cb(short when, ogs_socket_t fd, void *data)
-{
+    struct MHD_Daemon *mhd = data;
+
+    ogs_assert(mhd);
+    ogs_fatal("mhd_recv_cb = %p, %d", mhd, fd);
+    MHD_run(mhd);
 }
 
 static void
@@ -74,18 +76,28 @@ notify_connection_cb(void *cls,
                      void **socket_context,
                      enum MHD_ConnectionNotificationCode toe)
 {
-    const union MHD_ConnectionInfo *info;
+    struct MHD_Daemon *mhd = NULL;
+    MHD_socket connect_fd = INVALID_SOCKET;
+
+    const union MHD_ConnectionInfo *info = NULL;
     ogs_poll_t *poll = NULL;
 
-    (void) cls;
-    (void) connection;  /* Unused. Silent compiler warning. */
     switch (toe) {
         case MHD_CONNECTION_NOTIFY_STARTED:
             info = MHD_get_connection_info(
+                    connection, MHD_CONNECTION_INFO_DAEMON);
+            ogs_assert(info);
+            mhd = info->daemon;
+            ogs_assert(mhd);
+
+            info = MHD_get_connection_info(
                     connection, MHD_CONNECTION_INFO_CONNECTION_FD);
             ogs_assert(info);
+            connect_fd = info->connect_fd;
+            ogs_assert(connect_fd != INVALID_SOCKET);
+
             poll = ogs_pollset_add(nrf_self()->pollset,
-                    OGS_POLLIN, info->connect_fd, _client_recv_cb, NULL);
+                    OGS_POLLIN, connect_fd, mhd_recv_cb, mhd);
             ogs_assert(poll);
             *socket_context = poll;
             break;
@@ -118,7 +130,7 @@ int ogs_mhd_server(void)
         return 1;
 
     g_poll = ogs_pollset_add(nrf_self()->pollset,
-            OGS_POLLIN, info->listen_fd, _server_recv_cb, NULL);
+            OGS_POLLIN, info->listen_fd, mhd_recv_cb, d);
 
     return 0;
 }
@@ -187,9 +199,6 @@ static void nrf_main(void *data)
     for ( ;; ) {
         ogs_pollset_poll(nrf_self()->pollset,
                 ogs_timer_mgr_next(nrf_self()->timer_mgr));
-
-        /* Process the MHD */
-        MHD_run(d);
 
         /* Process the MESSAGE FIRST.
          *
