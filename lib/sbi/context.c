@@ -26,18 +26,13 @@ static ogs_sbi_context_t self;
 
 static int context_initialized = 0;
 
-void ogs_sbi_context_init(
-    ogs_queue_t *queue, ogs_timer_mgr_t *timer_mgr, ogs_pollset_t *pollset)
+void ogs_sbi_context_init(ogs_pollset_t *pollset)
 {
     ogs_assert(context_initialized == 0);
 
     /* Initialize SMF context */
     memset(&self, 0, sizeof(ogs_sbi_context_t));
 
-    ogs_assert(queue);
-    self.queue = queue;
-    ogs_assert(timer_mgr);
-    self.timer_mgr = timer_mgr;
     ogs_assert(pollset);
     self.pollset = pollset;
 
@@ -53,7 +48,6 @@ void ogs_sbi_context_final(void)
 {
     ogs_assert(context_initialized == 1);
 
-    ogs_sbi_server_remove_all();
     ogs_pool_final(&self.server_pool);
 
     context_initialized = 0;

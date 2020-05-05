@@ -18,6 +18,7 @@
 libnrf_sources = files('''
     context.c
     event.c
+    sbi-path.c
     nrf-sm.c
 
     init.c

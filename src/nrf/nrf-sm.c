@@ -17,9 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "nrf-sm.h"
 #include "context.h"
-#include "event.h"
+#include "sbi-path.h"
+#include "nrf-sm.h"
 
 void nrf_state_initial(ogs_fsm_t *s, nrf_event_t *e)
 {
@@ -39,8 +39,8 @@ void nrf_state_final(ogs_fsm_t *s, nrf_event_t *e)
 
 void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
 {
-#if 0
     int rv;
+#if 0
     ogs_pkbuf_t *recvbuf = NULL;
 
     ogs_pfcp_message_t pfcp_message;
@@ -54,16 +54,11 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
 
     switch (e->id) {
     case OGS_FSM_ENTRY_SIG:
+        rv = nrf_sbi_open();
+        if (rv != OGS_OK) {
+            ogs_fatal("Can't establish SBI path");
+        }
 #if 0
-        rv = nrf_pfcp_open();
-        if (rv != OGS_OK) {
-            ogs_fatal("Can't establish N4-PFCP path");
-        }
-        rv = nrf_gtp_open();
-        if (rv != OGS_OK) {
-            ogs_fatal("Can't establish GTP-U path");
-        }
-
         ogs_list_for_each(&ogs_pfcp_self()->n4_list, node) {
             nrf_event_t e;
             e.pfcp_node = node;
@@ -84,9 +79,8 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
             ogs_fsm_delete(&node->sm);
         }
 
-        nrf_pfcp_close();
-        nrf_gtp_close();
 #endif
+        nrf_sbi_close();
         break;
     case NRF_EVT_SBI_MESSAGE:
 #if 0

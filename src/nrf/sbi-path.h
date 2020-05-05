@@ -17,24 +17,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined(OGS_SBI_INSIDE) && !defined(OGS_SBI_COMPILATION)
-#error "This header cannot be included directly."
-#endif
+#ifndef NRF_SBI_PATH_H
+#define NRF_SBI_PATH_H
 
-#ifndef OGS_SBI_SERVER_H
-#define OGS_SBI_SERVER_H
+#include "ogs-sbi.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ogs_sbi_server_t *ogs_sbi_server_add(
-        ogs_sockaddr_t *addr, void (*cb)(void *data), void *data);
-void ogs_sbi_server_remove(ogs_sbi_server_t *server);
-void ogs_sbi_server_remove_all(void);
+int nrf_sbi_open(void);
+void nrf_sbi_close(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OGS_SBI_SERVER_H */
+#endif /* NRF_SBI_PATH_H */
