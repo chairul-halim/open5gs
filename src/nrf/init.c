@@ -36,7 +36,6 @@ ahc_echo (void *cls,
           size_t *upload_data_size,
           void **ptr)
 {
-    static int aptr;
     const char *me = cls;
     struct MHD_Response *response;
     int ret;
@@ -48,12 +47,6 @@ ahc_echo (void *cls,
 
     if (0 != strcmp (method, "GET"))
         return MHD_NO;              /* unexpected method */
-    if (&aptr != *ptr) {
-        /* do never respond on first call */
-        *ptr = &aptr;
-        return MHD_YES;
-    }
-    *ptr = NULL;                  /* reset when done */
     response = MHD_create_response_from_buffer (strlen (me),
     (void *)me,
     MHD_RESPMEM_PERSISTENT);
@@ -68,30 +61,64 @@ ahc_echo (void *cls,
 int ogs_mhd_server(void);
 static struct MHD_Daemon *d;
 
-static void _gtpv2_c_recv_cb(short when, ogs_socket_t fd, void *data)
+static void _server_recv_cb(short when, ogs_socket_t fd, void *data)
 {
-    ogs_fatal("asdlkfjlksdfasdf");
 }
+static void _client_recv_cb(short when, ogs_socket_t fd, void *data)
+{
+}
+
+static void
+notify_connection_cb(void *cls,
+                     struct MHD_Connection *connection,
+                     void **socket_context,
+                     enum MHD_ConnectionNotificationCode toe)
+{
+    const union MHD_ConnectionInfo *info;
+    ogs_poll_t *poll = NULL;
+
+    (void) cls;
+    (void) connection;  /* Unused. Silent compiler warning. */
+    switch (toe) {
+        case MHD_CONNECTION_NOTIFY_STARTED:
+            info = MHD_get_connection_info(
+                    connection, MHD_CONNECTION_INFO_CONNECTION_FD);
+            ogs_assert(info);
+            poll = ogs_pollset_add(nrf_self()->pollset,
+                    OGS_POLLIN, info->connect_fd, _client_recv_cb, NULL);
+            ogs_assert(poll);
+            *socket_context = poll;
+            break;
+        case MHD_CONNECTION_NOTIFY_CLOSED:
+            poll = *socket_context;
+            ogs_pollset_remove(poll);
+            break;
+    }
+}
+
+
+static ogs_poll_t *g_poll = NULL;
 
 int ogs_mhd_server(void)
 {
     const union MHD_DaemonInfo *info;
 
     /* initialize PRNG */
-    d = MHD_start_daemon(MHD_USE_AUTO,
-                        8080,
-                        NULL, NULL,
-                        &ahc_echo, (void*)PAGE,
-                        MHD_OPTION_END);
+    d = MHD_start_daemon(1,
+                    8080,
+                    NULL, NULL,
+                    &ahc_echo, (void*)PAGE,
+                    MHD_OPTION_NOTIFY_CONNECTION, &notify_connection_cb, NULL,
+                    MHD_OPTION_END);
     if (NULL == d)
         return 1;
 
-    info = MHD_get_daemon_info(d, MHD_DAEMON_INFO_EPOLL_FD);
+    info = MHD_get_daemon_info(d, MHD_DAEMON_INFO_LISTEN_FD);
     if (info == NULL)
         return 1;
 
-    ogs_pollset_add(nrf_self()->pollset,
-            OGS_POLLIN, info->listen_fd, _gtpv2_c_recv_cb, NULL);
+    g_poll = ogs_pollset_add(nrf_self()->pollset,
+            OGS_POLLIN, info->listen_fd, _server_recv_cb, NULL);
 
     return 0;
 }
@@ -136,6 +163,8 @@ void nrf_terminate(void)
 
     MHD_stop_daemon(d);
 
+    ogs_pollset_remove(g_poll);
+
     nrf_event_term();
 
     ogs_thread_destroy(thread);
@@ -160,7 +189,6 @@ static void nrf_main(void *data)
                 ogs_timer_mgr_next(nrf_self()->timer_mgr));
 
         /* Process the MHD */
-        ogs_fatal("MHD_run");
         MHD_run(d);
 
         /* Process the MESSAGE FIRST.
