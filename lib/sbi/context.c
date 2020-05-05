@@ -43,7 +43,7 @@ void ogs_sbi_context_init(
 
     ogs_log_install_domain(&__ogs_sbi_domain, "sbi", ogs_core()->log.level);
 
-    ogs_sbi_server_init();
+    ogs_pool_init(&self.server_pool, ogs_config()->pool.sbi);
     ogs_list_init(&self.server_list);
 
     context_initialized = 1;
@@ -54,7 +54,7 @@ void ogs_sbi_context_final(void)
     ogs_assert(context_initialized == 1);
 
     ogs_sbi_server_remove_all();
-    ogs_sbi_server_final();
+    ogs_pool_final(&self.server_pool);
 
     context_initialized = 0;
 }

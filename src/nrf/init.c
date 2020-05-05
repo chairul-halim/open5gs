@@ -21,120 +21,6 @@
 #include "event.h"
 #include "nrf-sm.h"
 
-#include "microhttpd.h"
-
-#define PAGE \
-  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
-
-static int
-ahc_echo (void *cls,
-          struct MHD_Connection *connection,
-          const char *url,
-          const char *method,
-          const char *version,
-          const char *upload_data,
-          size_t *upload_data_size,
-          void **ptr)
-{
-    const char *me = cls;
-    struct MHD_Response *response;
-    int ret;
-
-    (void) url;               /* Unused. Silent compiler warning. */
-    (void) version;           /* Unused. Silent compiler warning. */
-    (void) upload_data;       /* Unused. Silent compiler warning. */
-    (void) upload_data_size;  /* Unused. Silent compiler warning. */
-
-    if (0 != strcmp (method, "GET"))
-        return MHD_NO;              /* unexpected method */
-    response = MHD_create_response_from_buffer (strlen (me),
-    (void *)me,
-    MHD_RESPMEM_PERSISTENT);
-    ret = MHD_queue_response (connection,
-            MHD_HTTP_OK,
-            response);
-    MHD_destroy_response (response);
-
-    return ret;
-}
-
-int ogs_mhd_server(void);
-static struct MHD_Daemon *d;
-
-static void mhd_recv_cb(short when, ogs_socket_t fd, void *data)
-{
-    struct MHD_Daemon *mhd = data;
-
-    ogs_assert(mhd);
-    ogs_fatal("mhd_recv_cb = %p, %d", mhd, fd);
-    MHD_run(mhd);
-}
-
-static void
-notify_connection_cb(void *cls,
-                     struct MHD_Connection *connection,
-                     void **socket_context,
-                     enum MHD_ConnectionNotificationCode toe)
-{
-    struct MHD_Daemon *mhd = NULL;
-    MHD_socket connect_fd = INVALID_SOCKET;
-
-    const union MHD_ConnectionInfo *info = NULL;
-    ogs_poll_t *poll = NULL;
-
-    switch (toe) {
-        case MHD_CONNECTION_NOTIFY_STARTED:
-            info = MHD_get_connection_info(
-                    connection, MHD_CONNECTION_INFO_DAEMON);
-            ogs_assert(info);
-            mhd = info->daemon;
-            ogs_assert(mhd);
-
-            info = MHD_get_connection_info(
-                    connection, MHD_CONNECTION_INFO_CONNECTION_FD);
-            ogs_assert(info);
-            connect_fd = info->connect_fd;
-            ogs_assert(connect_fd != INVALID_SOCKET);
-
-            poll = ogs_pollset_add(nrf_self()->pollset,
-                    OGS_POLLIN, connect_fd, mhd_recv_cb, mhd);
-            ogs_assert(poll);
-            *socket_context = poll;
-            break;
-        case MHD_CONNECTION_NOTIFY_CLOSED:
-            poll = *socket_context;
-            ogs_pollset_remove(poll);
-            break;
-    }
-}
-
-
-static ogs_poll_t *g_poll = NULL;
-
-int ogs_mhd_server(void)
-{
-    const union MHD_DaemonInfo *info;
-
-    /* initialize PRNG */
-    d = MHD_start_daemon(1,
-                    8080,
-                    NULL, NULL,
-                    &ahc_echo, (void*)PAGE,
-                    MHD_OPTION_NOTIFY_CONNECTION, &notify_connection_cb, NULL,
-                    MHD_OPTION_END);
-    if (NULL == d)
-        return 1;
-
-    info = MHD_get_daemon_info(d, MHD_DAEMON_INFO_LISTEN_FD);
-    if (info == NULL)
-        return 1;
-
-    g_poll = ogs_pollset_add(nrf_self()->pollset,
-            OGS_POLLIN, info->listen_fd, mhd_recv_cb, d);
-
-    return 0;
-}
-
 static ogs_thread_t *thread;
 static void nrf_main(void *data);
 static int initialized = 0;
@@ -161,7 +47,7 @@ int nrf_initialize()
     rv = nrf_db_init();
     if (rv != OGS_OK) return rv;
 
-    ogs_mhd_server();
+    ogs_sbi_server_add(NULL, NULL, NULL);
 
     thread = ogs_thread_create(nrf_main, NULL);
     if (!thread) return OGS_ERROR;
@@ -174,10 +60,6 @@ int nrf_initialize()
 void nrf_terminate(void)
 {
     if (!initialized) return;
-
-    MHD_stop_daemon(d);
-
-    ogs_pollset_remove(g_poll);
 
     nrf_event_term(); /* Termniate event */
 

@@ -28,6 +28,16 @@
 extern "C" {
 #endif
 
+typedef struct ogs_sbi_server_s {
+    ogs_lnode_t     lnode;          /* A node of list_t */
+
+    void (*cb)(void*);              /* callback function */
+    void *data;                     /* callback argument */
+
+    void            *mhd;           /* MHD instance */
+    ogs_poll_t      *poll;          /* MHD server poll */
+} ogs_sbi_server_t;
+
 typedef struct ogs_sbi_context_s {
     ogs_queue_t     *queue;         /* Queue for processing UPF control */
     ogs_timer_mgr_t *timer_mgr;     /* Timer Manager */
@@ -36,7 +46,8 @@ typedef struct ogs_sbi_context_s {
     uint32_t        http_port;      /* SBI HTTP local port */
     uint32_t        https_port;     /* SBI HTTPS local port */
 
-    ogs_list_t      server_list;    /* SBI Server List */
+    ogs_list_t      server_list;                /* SBI Server list */
+    OGS_POOL(server_pool, ogs_sbi_server_t);    /* SBI server pool */
 
 } ogs_sbi_context_t;
 
