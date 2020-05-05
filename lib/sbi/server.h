@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 ogs_sbi_server_t *ogs_sbi_server_add(
-        ogs_sockaddr_t *addr, void (*cb)(void *data), void *data);
+        ogs_sockaddr_t *addr, int (*cb)(void *data));
 void ogs_sbi_server_remove(ogs_sbi_server_t *server);
 void ogs_sbi_server_remove_all(void);
 

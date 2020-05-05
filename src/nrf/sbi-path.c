@@ -18,10 +18,35 @@
  */
 
 #include "sbi-path.h"
+#include "microhttpd.h"
+
+#define PAGE \
+  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
+
+static int sbi_recv_cb(void *data)
+{
+    struct MHD_Connection *connection = NULL;
+    const char *me = PAGE;
+    struct MHD_Response *response;
+    int ret;
+
+    connection = data;
+    ogs_assert(connection);
+
+    response = MHD_create_response_from_buffer(
+            strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
+    ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
+    MHD_destroy_response(response);
+
+    if (ret != MHD_YES)
+        return OGS_ERROR;
+
+    return OGS_OK;
+}
 
 int nrf_sbi_open(void)
 {
-    ogs_sbi_server_add(NULL, NULL, NULL);
+    ogs_sbi_server_add(NULL, sbi_recv_cb);
 
     return OGS_OK;
 }

@@ -31,8 +31,7 @@ extern "C" {
 typedef struct ogs_sbi_server_s {
     ogs_lnode_t     lnode;          /* A node of list_t */
 
-    void            (*cb)(void*);   /* callback function */
-    void            *data;          /* callback argument */
+    int             (*cb)(void*);   /* callback handler */
 
     void            *mhd;           /* MHD instance */
     ogs_poll_t      *poll;          /* MHD server poll */

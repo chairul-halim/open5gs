@@ -35,7 +35,7 @@ static int mhd_webservice_dispatch(void *cls,
         void **ptr);
 
 ogs_sbi_server_t *ogs_sbi_server_add(
-        ogs_sockaddr_t *addr, void (*cb)(void *data), void *data)
+        ogs_sockaddr_t *addr, int (*cb)(void *data))
 {
     const union MHD_DaemonInfo *info = NULL;
     ogs_sbi_server_t *node = NULL;
@@ -46,7 +46,6 @@ ogs_sbi_server_t *ogs_sbi_server_add(
 
     /* Setup callback function */
     node->cb = cb;
-    node->data = data;
 
     node->mhd = MHD_start_daemon(1, 8080,
                 NULL, NULL,
@@ -138,9 +137,6 @@ static void mhd_notify_connection_cb(void *cls,
     }
 }
 
-#define PAGE \
-  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
-
 static int mhd_webservice_dispatch(void *cls,
         struct MHD_Connection *connection,
         const char *url,
@@ -150,16 +146,16 @@ static int mhd_webservice_dispatch(void *cls,
         size_t *upload_data_size,
         void **ptr)
 {
-    const char *me = PAGE;
-    struct MHD_Response *response;
-    int ret;
+    ogs_sbi_server_t *node = NULL;
+
+    node = cls;
+    ogs_assert(node);
 
     if (0 != strcmp (method, "GET"))
         return MHD_NO;              /* unexpected method */
-    response = MHD_create_response_from_buffer(
-            strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
-    ret = MHD_queue_response (connection, MHD_HTTP_OK, response);
-    MHD_destroy_response (response);
 
-    return ret;
+    if (node->cb(connection) != OGS_OK)
+        return MHD_NO;
+
+    return MHD_YES;
 }
