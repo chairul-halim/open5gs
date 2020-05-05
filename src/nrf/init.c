@@ -21,6 +21,82 @@
 #include "event.h"
 #include "nrf-sm.h"
 
+#include "microhttpd.h"
+
+#define PAGE \
+  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
+
+static int
+ahc_echo (void *cls,
+          struct MHD_Connection *connection,
+          const char *url,
+          const char *method,
+          const char *version,
+          const char *upload_data,
+          size_t *upload_data_size,
+          void **ptr)
+{
+    static int aptr;
+    const char *me = cls;
+    struct MHD_Response *response;
+    int ret;
+
+    (void) url;               /* Unused. Silent compiler warning. */
+    (void) version;           /* Unused. Silent compiler warning. */
+    (void) upload_data;       /* Unused. Silent compiler warning. */
+    (void) upload_data_size;  /* Unused. Silent compiler warning. */
+
+    if (0 != strcmp (method, "GET"))
+        return MHD_NO;              /* unexpected method */
+    if (&aptr != *ptr) {
+        /* do never respond on first call */
+        *ptr = &aptr;
+        return MHD_YES;
+    }
+    *ptr = NULL;                  /* reset when done */
+    response = MHD_create_response_from_buffer (strlen (me),
+    (void *)me,
+    MHD_RESPMEM_PERSISTENT);
+    ret = MHD_queue_response (connection,
+            MHD_HTTP_OK,
+            response);
+    MHD_destroy_response (response);
+
+    return ret;
+}
+
+int ogs_mhd_server(void);
+static struct MHD_Daemon *d;
+
+static void _gtpv2_c_recv_cb(short when, ogs_socket_t fd, void *data)
+{
+    ogs_fatal("asdlkfjlksdfasdf");
+}
+
+int ogs_mhd_server(void)
+{
+    const union MHD_DaemonInfo *info;
+
+    /* initialize PRNG */
+    d = MHD_start_daemon(MHD_USE_EPOLL | MHD_ALLOW_SUSPEND_RESUME,
+                        8080,
+                        NULL, NULL,
+                        &ahc_echo, (void*)PAGE,
+                        MHD_OPTION_END);
+    if (NULL == d)
+        return 1;
+
+    info = MHD_get_daemon_info(d, MHD_DAEMON_INFO_EPOLL_FD);
+    if (info == NULL)
+        return 1;
+
+    ogs_fatal("listen = %d", info->listen_fd);
+    ogs_pollset_add(nrf_self()->pollset,
+            OGS_POLLIN, info->epoll_fd, _gtpv2_c_recv_cb, NULL);
+
+    return 0;
+}
+
 static ogs_thread_t *thread;
 static void nrf_main(void *data);
 static int initialized = 0;
@@ -45,6 +121,8 @@ int nrf_initialize()
     rv = ogs_sbi_init(8080);
     if (rv != OGS_OK) return OGS_ERROR;
 
+    ogs_mhd_server();
+
     thread = ogs_thread_create(nrf_main, NULL);
     if (!thread) return OGS_ERROR;
 
@@ -56,6 +134,8 @@ int nrf_initialize()
 void nrf_terminate(void)
 {
     if (!initialized) return;
+
+    MHD_stop_daemon(d);
 
     nrf_event_term();
 
@@ -79,6 +159,9 @@ static void nrf_main(void *data)
     for ( ;; ) {
         ogs_pollset_poll(nrf_self()->pollset,
                 ogs_timer_mgr_next(nrf_self()->timer_mgr));
+
+        /* Process the MHD */
+        MHD_run(d);
 
         /* Process the MESSAGE FIRST.
          *

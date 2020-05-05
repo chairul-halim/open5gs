@@ -19,6 +19,7 @@
 
 #include "ogs-sbi.h"
 
+#if 0
 #include "ulfius/ulfius.h"
 
 #define PREFIX "/test"
@@ -26,9 +27,11 @@
 #define PREFIXCOOKIE "/testcookie"
 
 #define PROXY_DEST "https://www.wikipedia.org"
+#endif
 
 int __ogs_sbi_domain;
 
+#if 0
 static struct _u_instance instance;
 
 char *print_map(const struct _u_map *map)
@@ -112,9 +115,11 @@ int callback_all_test_foo(const struct _u_request *request,
     o_free(response_body);
     return U_CALLBACK_CONTINUE;
 }
+#endif
 
 int ogs_sbi_init(uint16_t port)
 {
+#if 0
     int rv;
 
     rv = ulfius_init_instance(&instance, port, NULL, NULL);
@@ -142,16 +147,19 @@ int ogs_sbi_init(uint16_t port)
         ogs_error("ulfius_start_framework(%d) failed", port);
         return OGS_ERROR;
     }
+#endif
 
     return OGS_OK;
 }
 
 void ogs_sbi_final(void)
 {
+#if 0
     int rv;
     rv = ulfius_stop_framework(&instance);
     if (rv != OGS_OK)
         ogs_error("ulfius_stop_framework failed");
 
     ulfius_clean_instance(&instance);
+#endif
 }

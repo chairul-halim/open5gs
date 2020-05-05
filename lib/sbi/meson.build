@@ -19,11 +19,7 @@ libsbi_sources = files('''
     path.c
     init.c
 
-    ulfius/orcania.c
-    ulfius/u_map.c
-    ulfius/u_response.c
-    ulfius/ulfius.c
-    ulfius/u_request.c
+    mhd/server.c
 
     src/list.c
     src/apiKey.c

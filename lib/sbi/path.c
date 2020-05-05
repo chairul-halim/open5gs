@@ -21,15 +21,5 @@
 
 ogs_sock_t *ogs_sbi_server(ogs_socknode_t *node)
 {
-    char buf[OGS_ADDRSTRLEN];
-    ogs_sock_t *sbi;
-    ogs_assert(node);
-
-    sbi = ogs_udp_server(node);
-    ogs_assert(sbi);
-
-    ogs_info("sbi_server() [%s]:%d",
-            OGS_ADDR(node->addr, buf), OGS_PORT(node->addr));
-
-    return sbi;
+    return NULL;
 }
