@@ -37,6 +37,11 @@ void nrf_state_final(ogs_fsm_t *s, nrf_event_t *e)
     ogs_assert(s);
 }
 
+#include "microhttpd.h"
+
+#define PAGE \
+  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
+
 void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
 {
     int rv;
@@ -83,6 +88,25 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
         nrf_sbi_close();
         break;
     case NRF_EVT_SBI_MESSAGE:
+        ogs_fatal("NRF_EVT_SBI_MESSAGE");
+
+        {
+        struct MHD_Connection *connection = NULL;
+        const char *me = PAGE;
+        struct MHD_Response *response;
+        int ret;
+
+        connection = e->connection;
+
+        response = MHD_create_response_from_buffer(
+                strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
+
+        MHD_resume_connection(connection);
+        ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
+        ogs_assert(ret == MHD_YES);
+        MHD_destroy_response(response);
+        }
+
 #if 0
         ogs_assert(e);
         recvbuf = e->pkbuf;

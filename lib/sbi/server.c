@@ -47,7 +47,9 @@ ogs_sbi_server_t *ogs_sbi_server_add(
     /* Setup callback function */
     node->cb = cb;
 
-    node->mhd = MHD_start_daemon(1, 8080,
+    node->mhd = MHD_start_daemon(
+                MHD_ALLOW_SUSPEND_RESUME,
+                8080,
                 NULL, NULL,
                 &mhd_webservice_dispatch, node,
                 MHD_OPTION_NOTIFY_CONNECTION, &mhd_notify_connection_cb, NULL,
@@ -126,7 +128,7 @@ static void mhd_notify_connection_cb(void *cls,
             ogs_assert(connect_fd != INVALID_SOCKET);
 
             poll = ogs_pollset_add(ogs_sbi_self()->pollset,
-                    OGS_POLLIN, connect_fd, mhd_run, mhd);
+                    OGS_POLLIN|OGS_POLLOUT, connect_fd, mhd_run, mhd);
             ogs_assert(poll);
             *socket_context = poll;
             break;
@@ -154,6 +156,8 @@ static int mhd_webservice_dispatch(void *cls,
     if (0 != strcmp (method, "GET"))
         return MHD_NO;              /* unexpected method */
 
+    MHD_suspend_connection(connection);
+    ogs_fatal("webservice");
     if (node->cb(connection) != OGS_OK)
         return MHD_NO;
 

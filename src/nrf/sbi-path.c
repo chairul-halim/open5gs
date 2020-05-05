@@ -42,18 +42,13 @@ static int sbi_recv_cb(void *data)
     ogs_assert(e);
     e->connection = connection;
 
+    ogs_fatal("sbi_recv_cb");
     rv = ogs_queue_push(nrf_self()->queue, e);
     if (rv != OGS_OK) {
         ogs_error("ogs_queue_push() failed:%d", (int)rv);
         nrf_event_free(e);
         return OGS_ERROR;
     }
-
-    response = MHD_create_response_from_buffer(
-            strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
-    ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-    ogs_assert(ret == MHD_YES);
-    MHD_destroy_response(response);
 
     return OGS_OK;
 }
