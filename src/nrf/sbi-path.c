@@ -18,6 +18,8 @@
  */
 
 #include "sbi-path.h"
+#include "context.h"
+#include "event.h"
 #include "microhttpd.h"
 
 #define PAGE \
@@ -25,6 +27,9 @@
 
 static int sbi_recv_cb(void *data)
 {
+    nrf_event_t *e = NULL;
+    int rv;
+
     struct MHD_Connection *connection = NULL;
     const char *me = PAGE;
     struct MHD_Response *response;
@@ -33,13 +38,22 @@ static int sbi_recv_cb(void *data)
     connection = data;
     ogs_assert(connection);
 
+    e = nrf_event_new(NRF_EVT_SBI_MESSAGE);
+    ogs_assert(e);
+    e->connection = connection;
+
+    rv = ogs_queue_push(nrf_self()->queue, e);
+    if (rv != OGS_OK) {
+        ogs_error("ogs_queue_push() failed:%d", (int)rv);
+        nrf_event_free(e);
+        return OGS_ERROR;
+    }
+
     response = MHD_create_response_from_buffer(
             strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
     ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
+    ogs_assert(ret == MHD_YES);
     MHD_destroy_response(response);
-
-    if (ret != MHD_YES)
-        return OGS_ERROR;
 
     return OGS_OK;
 }

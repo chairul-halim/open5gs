@@ -37,6 +37,7 @@ typedef enum {
 
 typedef struct nrf_event_s {
     int id;
+    void *connection;
 } nrf_event_t;
 
 void nrf_event_init(void);
