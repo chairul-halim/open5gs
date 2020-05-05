@@ -39,7 +39,7 @@
                 ogs_sbi_{{classVarName}}_{{name}}_e ogs_sbi_{{name}}{{classname}}_FromString(char* {{name}})
                 {
                     int stringToReturn = 0;
-                    char *{{name}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
+                    const char *{{name}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
                     size_t sizeofArray = sizeof({{name}}Array) / sizeof({{name}}Array[0]);
                     while (stringToReturn < sizeofArray) {
                         if (strcmp({{name}}, {{name}}Array[stringToReturn]) == 0) {

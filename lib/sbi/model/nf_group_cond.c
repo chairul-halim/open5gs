@@ -13,7 +13,7 @@ char *ogs_sbi_nf_typenf_group_cond_ToString(ogs_sbi_nf_group_cond_nf_type_e nf_t
 ogs_sbi_nf_group_cond_nf_type_e ogs_sbi_nf_typenf_group_cond_FromString(char* nf_type)
 {
     int stringToReturn = 0;
-    char *nf_typeArray[] =  { "NULL", "UDM", "AUSF", "UDR", "PCF" };
+    const char *nf_typeArray[] =  { "NULL", "UDM", "AUSF", "UDR", "PCF" };
     size_t sizeofArray = sizeof(nf_typeArray) / sizeof(nf_typeArray[0]);
     while (stringToReturn < sizeofArray) {
         if (strcmp(nf_type, nf_typeArray[stringToReturn]) == 0) {
