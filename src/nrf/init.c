@@ -78,7 +78,7 @@ int ogs_mhd_server(void)
     const union MHD_DaemonInfo *info;
 
     /* initialize PRNG */
-    d = MHD_start_daemon(MHD_USE_EPOLL | MHD_ALLOW_SUSPEND_RESUME,
+    d = MHD_start_daemon(MHD_USE_AUTO,
                         8080,
                         NULL, NULL,
                         &ahc_echo, (void*)PAGE,
@@ -90,9 +90,8 @@ int ogs_mhd_server(void)
     if (info == NULL)
         return 1;
 
-    ogs_fatal("listen = %d", info->listen_fd);
     ogs_pollset_add(nrf_self()->pollset,
-            OGS_POLLIN, info->epoll_fd, _gtpv2_c_recv_cb, NULL);
+            OGS_POLLIN, info->listen_fd, _gtpv2_c_recv_cb, NULL);
 
     return 0;
 }
@@ -161,6 +160,7 @@ static void nrf_main(void *data)
                 ogs_timer_mgr_next(nrf_self()->timer_mgr));
 
         /* Process the MHD */
+        ogs_fatal("MHD_run");
         MHD_run(d);
 
         /* Process the MESSAGE FIRST.
