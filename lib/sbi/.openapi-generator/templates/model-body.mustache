@@ -30,10 +30,10 @@
     {{^isContainer}}
         {{#isPrimitiveType}}
             {{#isEnum}}
-                char* ogs_sbi_{{name}}{{classname}}_ToString(ogs_sbi_{{classVarName}}_{{name}}_e {{name}})
+                char *ogs_sbi_{{name}}{{classname}}_ToString(ogs_sbi_{{classVarName}}_{{name}}_e {{name}})
                 {
-                    char* {{name}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
-                    return {{name}}Array[{{name}}];
+                    const char *{{name}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
+                    return (char *){{name}}Array[{{name}}];
                 }
 
                 ogs_sbi_{{classVarName}}_{{name}}_e ogs_sbi_{{name}}{{classname}}_FromString(char* {{name}})
