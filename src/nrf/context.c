@@ -24,11 +24,11 @@ static nrf_context_t self;
 
 int __nrf_log_domain;
 
-static int context_initiaized = 0;
+static int context_initialized = 0;
 
 void nrf_context_init(void)
 {
-    ogs_assert(context_initiaized == 0);
+    ogs_assert(context_initialized == 0);
 
     /* Initialize NRF context */
     memset(&self, 0, sizeof(nrf_context_t));
@@ -38,16 +38,16 @@ void nrf_context_init(void)
 
     ogs_thread_mutex_init(&self.db_lock);
 
-    context_initiaized = 1;
+    context_initialized = 1;
 }
 
 void nrf_context_final(void)
 {
-    ogs_assert(context_initiaized == 1);
+    ogs_assert(context_initialized == 1);
 
     ogs_thread_mutex_destroy(&self.db_lock);
 
-    context_initiaized = 0;
+    context_initialized = 0;
 }
 
 nrf_context_t *nrf_self(void)

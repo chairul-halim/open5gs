@@ -41,7 +41,7 @@
 #define OGS_SBI_INSIDE
 
 #include "sbi/context.h"
-#include "sbi/path.h"
+#include "sbi/server.h"
 
 #undef OGS_SBI_INSIDE
 

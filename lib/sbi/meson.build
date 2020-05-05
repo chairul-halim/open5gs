@@ -17,7 +17,7 @@
 
 libsbi_sources = files('''
     context.c
-    path.c
+    server.c
 
     src/list.c
     src/apiKey.c
@@ -110,11 +110,6 @@ if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
                     '-Wno-unused-variable',
                     '-Wno-unused-label',
                     '-Wno-float-equal',
-                    '-Wno-discarded-qualifiers',
-                    '-Wno-implicit-function-declaration', # FIXME
-                    '-Wno-nested-externs', # FIXME
-                    '-Wno-int-conversion', # FIXME
-                    '-Wno-suggest-attribute=noreturn', # FIXME
     ])
 endif
 

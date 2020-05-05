@@ -40,20 +40,11 @@ typedef struct ogs_sbi_context_s {
 
 } ogs_sbi_context_t;
 
-typedef struct ogs_sbi_server_s {
-    ogs_lnode_t     lnode;          /* A node of list_t */
-
-} ogs_sbi_server_t;
-
 void ogs_sbi_context_init(
     ogs_queue_t *queue, ogs_timer_mgr_t *timer_mgr, ogs_pollset_t *pollset);
 void ogs_sbi_context_final(void);
 ogs_sbi_context_t *ogs_sbi_self(void);
 int ogs_sbi_context_parse_config(const char *local, const char *remote);
-
-ogs_sbi_server_t *ogs_sbi_server_add(ogs_sockaddr_t *addr);
-void ogs_sbi_server_remove(ogs_sbi_server_t *server);
-void ogs_sbi_server_remove_all(void);
 
 #ifdef __cplusplus
 }

@@ -24,15 +24,12 @@ int __ogs_sbi_domain;
 
 static ogs_sbi_context_t self;
 
-static OGS_POOL(ogs_sbi_server_pool, ogs_sbi_server_t);
-
-static int context_initiaized = 0;
+static int context_initialized = 0;
 
 void ogs_sbi_context_init(
     ogs_queue_t *queue, ogs_timer_mgr_t *timer_mgr, ogs_pollset_t *pollset)
 {
-    struct timeval tv;
-    ogs_assert(context_initiaized == 0);
+    ogs_assert(context_initialized == 0);
 
     /* Initialize SMF context */
     memset(&self, 0, sizeof(ogs_sbi_context_t));
@@ -46,22 +43,20 @@ void ogs_sbi_context_init(
 
     ogs_log_install_domain(&__ogs_sbi_domain, "sbi", ogs_core()->log.level);
 
-    ogs_pool_init(&ogs_sbi_server_pool, ogs_config()->pool.sbi);
-
+    ogs_sbi_server_init();
     ogs_list_init(&self.server_list);
 
-    context_initiaized = 1;
+    context_initialized = 1;
 }
 
 void ogs_sbi_context_final(void)
 {
-    ogs_assert(context_initiaized == 1);
+    ogs_assert(context_initialized == 1);
 
     ogs_sbi_server_remove_all();
+    ogs_sbi_server_final();
 
-    ogs_pool_final(&ogs_sbi_server_pool);
-
-    context_initiaized = 0;
+    context_initialized = 0;
 }
 
 ogs_sbi_context_t *ogs_sbi_self(void)
@@ -496,35 +491,4 @@ int ogs_sbi_context_parse_config(const char *local, const char *remote)
     if (rv != OGS_OK) return rv;
 
     return OGS_OK;
-}
-
-ogs_sbi_server_t *ogs_sbi_server_add(ogs_sockaddr_t *addr)
-{
-    ogs_sbi_server_t *node = NULL;
-
-    ogs_assert(addr);
-
-    ogs_pool_alloc(&ogs_sbi_server_pool, &node);
-    ogs_assert(node);
-    memset(node, 0, sizeof(ogs_sbi_server_t));
-
-    ogs_list_add(&self.server_list, node);
-
-    return node;
-}
-
-void ogs_sbi_server_remove(ogs_sbi_server_t *node)
-{
-    ogs_assert(node);
-
-    ogs_list_remove(&self.server_list, node);
-    ogs_pool_free(&ogs_sbi_server_pool, node);
-}
-
-void ogs_sbi_server_remove_all(void)
-{
-    ogs_sbi_server_t *node = NULL, *next_node = NULL;
-
-    ogs_list_for_each_safe(&self.server_list, next_node, node)
-        ogs_sbi_server_remove(node);
 }

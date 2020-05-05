@@ -30,7 +30,7 @@ static OGS_POOL(smf_bearer_pool, smf_bearer_t);
 
 static OGS_POOL(smf_pf_pool, smf_pf_t);
 
-static int context_initiaized = 0;
+static int context_initialized = 0;
 
 int num_sessions = 0;
 void stats_add_session(void) {
@@ -47,7 +47,7 @@ void stats_remove_session(void) {
 
 void smf_context_init(void)
 {
-    ogs_assert(context_initiaized == 0);
+    ogs_assert(context_initialized == 0);
 
     /* Initial FreeDiameter Config */
     memset(&g_diam_conf, 0, sizeof(ogs_diam_config_t));
@@ -78,12 +78,12 @@ void smf_context_init(void)
     self.ipv4_hash = ogs_hash_make();
     self.ipv6_hash = ogs_hash_make();
 
-    context_initiaized = 1;
+    context_initialized = 1;
 }
 
 void smf_context_final(void)
 {
-    ogs_assert(context_initiaized == 1);
+    ogs_assert(context_initialized == 1);
 
     smf_sess_remove_all();
 
@@ -103,7 +103,7 @@ void smf_context_final(void)
 
     ogs_gtp_node_final();
 
-    context_initiaized = 0;
+    context_initialized = 0;
 }
 
 smf_context_t *smf_self(void)
