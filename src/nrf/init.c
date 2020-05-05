@@ -18,7 +18,6 @@
  */
 
 #include "context.h"
-#include "event.h"
 #include "nrf-sm.h"
 
 static ogs_thread_t *thread;
@@ -30,7 +29,7 @@ int nrf_initialize()
     int rv;
 
     nrf_context_init();
-    nrf_event_init();
+    nrf_event_init(); /* Create event with timer, poll */
     ogs_sbi_context_init(nrf_self()->pollset); 
 
     rv = ogs_sbi_context_parse_config("nrf", NULL);
@@ -67,7 +66,7 @@ void nrf_terminate(void)
     ogs_sbi_context_final();
     nrf_context_final();
 
-    nrf_event_final(); /* Destroy event instance */
+    nrf_event_final(); /* Destroy event */
 }
 
 static void nrf_main(void *data)
