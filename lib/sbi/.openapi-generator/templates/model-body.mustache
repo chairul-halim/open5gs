@@ -7,14 +7,14 @@
 {{#isEnum}}
     char* ogs_sbi_{{classname}}_ToString(ogs_sbi_{{classVarName}}_e {{classname}})
     {
-        char *{{classname}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
-        return {{classname}}Array[{{classname}}];
+        const char *{{classname}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
+        return (char *){{classname}}Array[{{classname}}];
     }
 
     ogs_sbi_{{classVarName}}_e ogs_sbi_{{classname}}_FromString(char* {{classname}})
     {
         int stringToReturn = 0;
-        char *{{classname}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
+        const char *{{classname}}Array[] =  { "NULL"{{#allowableValues}}{{#enumVars}}, "{{{value}}}"{{/enumVars}}{{/allowableValues}} };
         size_t sizeofArray = sizeof({{classname}}Array) / sizeof({{classname}}Array[0]);
         while (stringToReturn < sizeofArray) {
             if (strcmp({{classname}}, {{classname}}Array[stringToReturn]) == 0) {

@@ -6,14 +6,14 @@
 
 char* ogs_sbi_nf_type_ToString(ogs_sbi_nf_type_e nf_type)
 {
-    char *nf_typeArray[] =  { "NULL", "NRF", "UDM", "AMF", "SMF", "AUSF", "NEF", "PCF", "SMSF", "NSSF", "UDR", "LMF", "GMLC", "5G_EIR", "SEPP", "UPF", "N3IWF", "AF", "UDSF", "BSF", "CHF", "NWDAF" };
-    return nf_typeArray[nf_type];
+    const char *nf_typeArray[] =  { "NULL", "NRF", "UDM", "AMF", "SMF", "AUSF", "NEF", "PCF", "SMSF", "NSSF", "UDR", "LMF", "GMLC", "5G_EIR", "SEPP", "UPF", "N3IWF", "AF", "UDSF", "BSF", "CHF", "NWDAF" };
+    return (char *)nf_typeArray[nf_type];
 }
 
 ogs_sbi_nf_type_e ogs_sbi_nf_type_FromString(char* nf_type)
 {
     int stringToReturn = 0;
-    char *nf_typeArray[] =  { "NULL", "NRF", "UDM", "AMF", "SMF", "AUSF", "NEF", "PCF", "SMSF", "NSSF", "UDR", "LMF", "GMLC", "5G_EIR", "SEPP", "UPF", "N3IWF", "AF", "UDSF", "BSF", "CHF", "NWDAF" };
+    const char *nf_typeArray[] =  { "NULL", "NRF", "UDM", "AMF", "SMF", "AUSF", "NEF", "PCF", "SMSF", "NSSF", "UDR", "LMF", "GMLC", "5G_EIR", "SEPP", "UPF", "N3IWF", "AF", "UDSF", "BSF", "CHF", "NWDAF" };
     size_t sizeofArray = sizeof(nf_typeArray) / sizeof(nf_typeArray[0]);
     while (stringToReturn < sizeofArray) {
         if (strcmp(nf_type, nf_typeArray[stringToReturn]) == 0) {
