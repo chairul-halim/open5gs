@@ -88,7 +88,9 @@ int ogs_sbi_context_parse_config(const char *local, const char *remote)
 {
     int rv;
     yaml_document_t *document = NULL;
+#if 0
     ogs_yaml_iter_t root_iter;
+#endif
 
     document = ogs_config()->document;
     ogs_assert(document);
