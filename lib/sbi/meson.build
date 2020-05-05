@@ -16,10 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 libsbi_sources = files('''
+    context.c
     path.c
-    init.c
-
-    mhd/server.c
 
     src/list.c
     src/apiKey.c
@@ -130,6 +128,7 @@ libsbi = library('ogssbi',
     c_args : sbi_cc_flags,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
+                    libapp_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep],
@@ -139,6 +138,7 @@ libsbi_dep = declare_dependency(
     link_with : libsbi,
     include_directories : [libsbi_inc, libinc],
     dependencies : [libcore_dep,
+                    libapp_dep,
                     libgnutls_dep,
                     libmicrohttpd_dep,
                     libcurl_dep])

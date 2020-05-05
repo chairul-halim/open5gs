@@ -140,6 +140,7 @@ static void recalculate_pool_size(void)
 
     self.pool.ue = self.max.ue * self.max.enb;
     self.pool.pfcp = ogs_max(self.max.smf, self.max.upf);
+    self.pool.sbi = self.pool.pfcp;
     self.pool.sess = self.pool.ue * OGS_MAX_NUM_OF_SESS;
     self.pool.bearer = self.pool.sess * MAX_NUM_OF_BEARER;
     self.pool.tunnel = self.pool.bearer * MAX_NUM_OF_TUNNEL;

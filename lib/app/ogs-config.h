@@ -78,6 +78,7 @@ typedef struct ogs_config_s {
 
         int ue;
         int pfcp;
+        int sbi;
         int sess;
         int bearer;
         int tunnel;

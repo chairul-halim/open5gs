@@ -34,7 +34,6 @@ void nrf_context_init(void)
     memset(&self, 0, sizeof(nrf_context_t));
 
     ogs_log_install_domain(&__ogs_dbi_domain, "dbi", ogs_core()->log.level);
-    ogs_log_install_domain(&__ogs_sbi_domain, "sbi", ogs_core()->log.level);
     ogs_log_install_domain(&__nrf_log_domain, "nrf", ogs_core()->log.level);
 
     ogs_thread_mutex_init(&self.db_lock);

@@ -144,7 +144,12 @@ int nrf_initialize()
     int rv;
 
     nrf_context_init();
-    nrf_event_init();
+    nrf_event_init(); /* Create event instance[Queue, Timer, Poll] */
+    ogs_sbi_context_init(
+        nrf_self()->queue, nrf_self()->timer_mgr, nrf_self()->pollset); 
+
+    rv = ogs_sbi_context_parse_config("nrf", NULL);
+    if (rv != OGS_OK) return rv;
 
     rv = nrf_context_parse_config();
     if (rv != OGS_OK) return rv;
@@ -155,9 +160,6 @@ int nrf_initialize()
 
     rv = nrf_db_init();
     if (rv != OGS_OK) return rv;
-
-    rv = ogs_sbi_init(8080);
-    if (rv != OGS_OK) return OGS_ERROR;
 
     ogs_mhd_server();
 
@@ -177,15 +179,16 @@ void nrf_terminate(void)
 
     ogs_pollset_remove(g_poll);
 
-    nrf_event_term();
+    nrf_event_term(); /* Termniate event */
 
     ogs_thread_destroy(thread);
 
-    ogs_sbi_final();
     nrf_db_final();
 
+    ogs_sbi_context_final();
     nrf_context_final();
-    nrf_event_final();
+
+    nrf_event_final(); /* Destroy event instance */
 }
 
 static void nrf_main(void *data)
