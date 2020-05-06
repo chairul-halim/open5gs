@@ -39,8 +39,8 @@ OGS_POOL(server_pool, ogs_sbi_server_t);
 OGS_POOL(request_pool, request_t);
 OGS_POOL(connection_pool, connection_t);
 
-static void mhd_run(short when, ogs_socket_t fd, void *data);
-static void mhd_notify_connection_cb(void *cls,
+static void run(short when, ogs_socket_t fd, void *data);
+static void notify_connection(void *cls,
         struct MHD_Connection *connection,
         void **socket_context,
         enum MHD_ConnectionNotificationCode toe);
@@ -160,7 +160,7 @@ ogs_sbi_server_t *ogs_sbi_server_add(
                 NULL, NULL,
                 access_handler, server,
                 MHD_OPTION_NOTIFY_COMPLETED, notify_completed, server,
-                MHD_OPTION_NOTIFY_CONNECTION, &mhd_notify_connection_cb, NULL,
+                MHD_OPTION_NOTIFY_CONNECTION, &notify_connection, NULL,
                 MHD_OPTION_END);
     if (!server->mhd) {
         ogs_error("Cannot start SBI server");
@@ -171,7 +171,7 @@ ogs_sbi_server_t *ogs_sbi_server_add(
     ogs_assert(info);
 
     server->poll = ogs_pollset_add(ogs_sbi_self()->pollset,
-            OGS_POLLIN, info->listen_fd, mhd_run, server->mhd);
+            OGS_POLLIN, info->listen_fd, run, server->mhd);
     ogs_assert(server->poll);
 
     ogs_list_add(&server_list, server);
@@ -204,16 +204,15 @@ void ogs_sbi_server_remove_all(void)
         ogs_sbi_server_remove(server);
 }
 
-static void mhd_run(short when, ogs_socket_t fd, void *data)
+static void run(short when, ogs_socket_t fd, void *data)
 {
     struct MHD_Daemon *mhd = data;
 
     ogs_assert(mhd);
-    ogs_fatal("mhd_run = %p, %d", mhd, fd);
     MHD_run(mhd);
 }
 
-static void mhd_notify_connection_cb(void *cls,
+static void notify_connection(void *cls,
         struct MHD_Connection *connection,
         void **socket_context,
         enum MHD_ConnectionNotificationCode toe)
@@ -239,7 +238,7 @@ static void mhd_notify_connection_cb(void *cls,
             ogs_assert(connect_fd != INVALID_SOCKET);
 
             poll = ogs_pollset_add(ogs_sbi_self()->pollset,
-                    OGS_POLLIN|OGS_POLLOUT, connect_fd, mhd_run, mhd);
+                    OGS_POLLIN|OGS_POLLOUT, connect_fd, run, mhd);
             ogs_assert(poll);
             *socket_context = poll;
             break;
@@ -268,8 +267,10 @@ static int access_handler(
 
     req = *con_cls;
 
-    if (req && req->suspended)
+    if (req && req->suspended) {
+        ogs_error("Suspended Request");
         return MHD_YES;
+    }
 
     if (!req) {
         req = request_new();
