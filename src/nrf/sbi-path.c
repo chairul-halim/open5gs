@@ -22,25 +22,14 @@
 #include "event.h"
 #include "microhttpd.h"
 
-#define PAGE \
-  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
-
 static int sbi_recv_cb(void *data)
 {
     nrf_event_t *e = NULL;
     int rv;
 
-    struct MHD_Connection *connection = NULL;
-    const char *me = PAGE;
-    struct MHD_Response *response;
-    int ret;
-
-    connection = data;
-    ogs_assert(connection);
-
     e = nrf_event_new(NRF_EVT_SBI_MESSAGE);
     ogs_assert(e);
-    e->connection = connection;
+    e->connection = data;
 
     ogs_fatal("sbi_recv_cb");
     rv = ogs_queue_push(nrf_self()->queue, e);

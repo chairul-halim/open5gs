@@ -37,9 +37,7 @@ void ogs_sbi_context_init(ogs_pollset_t *pollset)
     self.pollset = pollset;
 
     ogs_log_install_domain(&__ogs_sbi_domain, "sbi", ogs_core()->log.level);
-
-    ogs_pool_init(&self.server_pool, ogs_config()->pool.sbi);
-    ogs_list_init(&self.server_list);
+    ogs_sbi_server_init();
 
     context_initialized = 1;
 }
@@ -48,7 +46,7 @@ void ogs_sbi_context_final(void)
 {
     ogs_assert(context_initialized == 1);
 
-    ogs_pool_final(&self.server_pool);
+    ogs_sbi_server_final();
 
     context_initialized = 0;
 }

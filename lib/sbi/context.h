@@ -28,23 +28,11 @@
 extern "C" {
 #endif
 
-typedef struct ogs_sbi_server_s {
-    ogs_lnode_t     lnode;          /* A node of list_t */
-
-    int             (*cb)(void*);   /* callback handler */
-
-    void            *mhd;           /* MHD instance */
-    ogs_poll_t      *poll;          /* MHD server poll */
-} ogs_sbi_server_t;
-
 typedef struct ogs_sbi_context_s {
     ogs_pollset_t   *pollset;       /* Poll Set for I/O Multiplexing */
 
     uint32_t        http_port;      /* SBI HTTP local port */
     uint32_t        https_port;     /* SBI HTTPS local port */
-
-    ogs_list_t      server_list;                /* SBI Server list */
-    OGS_POOL(server_pool, ogs_sbi_server_t);    /* SBI server pool */
 
 } ogs_sbi_context_t;
 

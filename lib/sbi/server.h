@@ -28,6 +28,20 @@
 extern "C" {
 #endif
 
+typedef struct ogs_sbi_server_s {
+    ogs_lnode_t     lnode;          /* A node of list_t */
+
+    int             (*cb)(void*);   /* callback handler */
+
+    ogs_list_t      suspended_conn_list; /* MHD suspeconnection list */
+
+    void            *mhd;           /* MHD instance */
+    ogs_poll_t      *poll;          /* MHD server poll */
+} ogs_sbi_server_t;
+
+void ogs_sbi_server_init(void);
+void ogs_sbi_server_final(void);
+
 ogs_sbi_server_t *ogs_sbi_server_add(
         ogs_sockaddr_t *addr, int (*cb)(void *data));
 void ogs_sbi_server_remove(ogs_sbi_server_t *server);
