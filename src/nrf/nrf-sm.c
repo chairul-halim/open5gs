@@ -37,11 +37,6 @@ void nrf_state_final(ogs_fsm_t *s, nrf_event_t *e)
     ogs_assert(s);
 }
 
-#include "microhttpd.h"
-
-#define PAGE \
-  "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>"
-
 void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
 {
     int rv;
@@ -91,7 +86,8 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
         ogs_assert(e);
         ogs_assert(e->server.connection);
         {
-            const char *me = PAGE;
+            const char *me = "<html><head><title>libmicrohttpd demo</title></head><body>libmicrohttpd demo</body></html>";
+
             ogs_sbi_server_send_response(
                     e->server.connection, (void*)me, strlen(me));
         }
