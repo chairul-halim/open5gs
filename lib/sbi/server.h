@@ -33,7 +33,7 @@ typedef struct ogs_sbi_server_s {
 
     int             (*cb)(void*);   /* callback handler */
 
-    ogs_list_t      suspended_conn_list; /* MHD suspeconnection list */
+    ogs_list_t      suspended_conn_list; /* MHD suspended list */
 
     void            *mhd;           /* MHD instance */
     ogs_poll_t      *poll;          /* MHD server poll */
@@ -46,6 +46,8 @@ ogs_sbi_server_t *ogs_sbi_server_add(
         ogs_sockaddr_t *addr, int (*cb)(void *data));
 void ogs_sbi_server_remove(ogs_sbi_server_t *server);
 void ogs_sbi_server_remove_all(void);
+
+void ogs_sbi_server_send_response(void *node, void *buffer, size_t size);
 
 #ifdef __cplusplus
 }

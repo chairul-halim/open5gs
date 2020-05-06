@@ -29,9 +29,8 @@ static int sbi_recv_cb(void *data)
 
     e = nrf_event_new(NRF_EVT_SBI_MESSAGE);
     ogs_assert(e);
-    e->connection = data;
+    e->server.connection = data;
 
-    ogs_fatal("sbi_recv_cb");
     rv = ogs_queue_push(nrf_self()->queue, e);
     if (rv != OGS_OK) {
         ogs_error("ogs_queue_push() failed:%d", (int)rv);

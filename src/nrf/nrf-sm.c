@@ -88,23 +88,12 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
         nrf_sbi_close();
         break;
     case NRF_EVT_SBI_MESSAGE:
-        ogs_fatal("NRF_EVT_SBI_MESSAGE");
-
+        ogs_assert(e);
+        ogs_assert(e->server.connection);
         {
-        struct MHD_Connection *connection = NULL;
-        const char *me = PAGE;
-        struct MHD_Response *response;
-        int ret;
-
-        connection = e->connection;
-
-        response = MHD_create_response_from_buffer(
-                strlen(me), (void *)me, MHD_RESPMEM_PERSISTENT);
-
-        MHD_resume_connection(connection);
-        ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-        ogs_assert(ret == MHD_YES);
-        MHD_destroy_response(response);
+            const char *me = PAGE;
+            ogs_sbi_server_send_response(
+                    e->server.connection, (void*)me, strlen(me));
         }
 
 #if 0

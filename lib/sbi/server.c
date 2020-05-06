@@ -204,6 +204,27 @@ void ogs_sbi_server_remove_all(void)
         ogs_sbi_server_remove(server);
 }
 
+void ogs_sbi_server_send_response(void *node, void *buffer, size_t size)
+{
+    struct MHD_Connection *connection = NULL;
+    struct MHD_Response *response;
+    int ret;
+
+    connection_t *conn = node;
+
+    ogs_assert(conn);
+    connection = conn->connection;
+    ogs_assert(connection);
+
+    response = MHD_create_response_from_buffer(
+            size, buffer, MHD_RESPMEM_PERSISTENT);
+
+    MHD_resume_connection(connection);
+    ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
+    ogs_assert(ret == MHD_YES);
+    MHD_destroy_response(response);
+}
+
 static void run(short when, ogs_socket_t fd, void *data)
 {
     struct MHD_Daemon *mhd = data;
@@ -261,6 +282,7 @@ static int access_handler(
 {
     ogs_sbi_server_t *server = NULL;
     request_t *req = NULL;
+    connection_t *conn = NULL;
 
     server = cls;
     ogs_assert(server);
@@ -282,9 +304,10 @@ static int access_handler(
         MHD_suspend_connection(connection);
         req->suspended = true;
 
-        connection_add(server, connection);
+        conn = connection_add(server, connection);
+        ogs_assert(conn);
 
-        if (server->cb(connection) != OGS_OK) {
+        if (server->cb(conn) != OGS_OK) {
             ogs_error("server callback error");
             return MHD_NO;
         }
@@ -317,9 +340,10 @@ static int access_handler(
     MHD_suspend_connection(connection);
     req->suspended = true;
 
-    connection_add(server, connection);
+    conn = connection_add(server, connection);
+    ogs_assert(conn);
 
-    if (server->cb(connection) != OGS_OK) {
+    if (server->cb(conn) != OGS_OK) {
         ogs_error("server callback error");
         return MHD_NO;
     }
